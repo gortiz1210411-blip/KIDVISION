@@ -9,7 +9,42 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="FL Standards">
 <link rel="apple-touch-icon" href="icon-192.png">
-<script defer src="https://alcdn.msauth.net/browser/2.38.2/js/msal-browser.min.js"></script>
+<script defer src="https://alcdn.msauth.net/browser/2.38.2/js/msal-browser.min.js">
+// ----- CSV Import (roster) -----
+const studentCSV = document.getElementById('studentCSV');
+const importStudentsBtn = document.getElementById('importStudentsBtn');
+const downloadTemplateBtn = document.getElementById('downloadTemplateBtn');
+
+downloadTemplateBtn.addEventListener('click', ()=>{
+  const tmpl = 'name\nAlice Johnson\nBob Smith\n';
+  const blob = new Blob([tmpl], {type:'text/csv'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'roster-template.csv'; a.click();
+});
+
+importStudentsBtn.addEventListener('click', async ()=>{
+  const f = studentCSV.files && studentCSV.files[0];
+  if(!f) return alert('Choose a CSV file first.');
+  const text = await f.text();
+  const rows = text.split(/\r?\n/).filter(r => r.trim().length);
+  if(!rows.length) return alert('CSV is empty.');
+  const headers = rows[0].split(',').map(h=>h.trim().toLowerCase());
+  const nameIdx = headers.indexOf('name');
+  if(nameIdx === -1) return alert('CSV must include a "name" column in the first row.');
+  let added = 0;
+  for(let i=1;i<rows.length;i++){
+    const cols = rows[i].split(',');
+    const nm = (cols[nameIdx]||'').trim();
+    if(!nm) continue;
+    // avoid dupes: skip if same name already exists
+    if(STUDENTS.some(s => (s.name||'').trim().toLowerCase() === nm.toLowerCase())) continue;
+    STUDENTS.push({name: nm});
+    added++;
+  }
+  if(added){ renderStudents(); alert('Imported '+added+' students.'); }
+  else { alert('No new students found to import.'); }
+});
+
+</script>
 <style>
 :root { --bg:#0b1020; --card:#121a32; --accent:#6ae3ff; --muted:#9fb0d0; --line:#1e2a49; }
 * { box-sizing:border-box }
@@ -124,6 +159,11 @@ hr.split { border:0; border-top:1px solid var(--line); margin:10px 0 }
       <input id="newStudentName" placeholder="Add student name" style="flex:1">
       <button id="addStudentBtn">Add</button>
       <button id="clearStudentsBtn" style="background:#2a0e12;border-color:#5e1921" class="right">Clear students</button>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <input type="file" id="studentCSV" accept=".csv">
+      <button id="importStudentsBtn">Import CSV</button>
+      <button id="downloadTemplateBtn" class="right">Download template</button>
     </div>
     <small class="note" id="studentCount"></small>
 
@@ -444,6 +484,41 @@ document.getElementById('backupCSV').addEventListener('click', async ()=>{
 });
 
 if('serviceWorker' in navigator){ window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js')); }
+
+// ----- CSV Import (roster) -----
+const studentCSV = document.getElementById('studentCSV');
+const importStudentsBtn = document.getElementById('importStudentsBtn');
+const downloadTemplateBtn = document.getElementById('downloadTemplateBtn');
+
+downloadTemplateBtn.addEventListener('click', ()=>{
+  const tmpl = 'name\nAlice Johnson\nBob Smith\n';
+  const blob = new Blob([tmpl], {type:'text/csv'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'roster-template.csv'; a.click();
+});
+
+importStudentsBtn.addEventListener('click', async ()=>{
+  const f = studentCSV.files && studentCSV.files[0];
+  if(!f) return alert('Choose a CSV file first.');
+  const text = await f.text();
+  const rows = text.split(/\r?\n/).filter(r => r.trim().length);
+  if(!rows.length) return alert('CSV is empty.');
+  const headers = rows[0].split(',').map(h=>h.trim().toLowerCase());
+  const nameIdx = headers.indexOf('name');
+  if(nameIdx === -1) return alert('CSV must include a "name" column in the first row.');
+  let added = 0;
+  for(let i=1;i<rows.length;i++){
+    const cols = rows[i].split(',');
+    const nm = (cols[nameIdx]||'').trim();
+    if(!nm) continue;
+    // avoid dupes: skip if same name already exists
+    if(STUDENTS.some(s => (s.name||'').trim().toLowerCase() === nm.toLowerCase())) continue;
+    STUDENTS.push({name: nm});
+    added++;
+  }
+  if(added){ renderStudents(); alert('Imported '+added+' students.'); }
+  else { alert('No new students found to import.'); }
+});
+
 </script>
 </body>
 </html>

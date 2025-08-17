@@ -525,7 +525,7 @@ function init(){ renderStudents(); renderSubjects(); renderStandards(); renderTa
 // ===== Supabase Access Gate (single-use) =====
 let SB_CFG = JSON.parse(localStorage.getItem('kv_supabase_cfg')||'{}');
 const SB_URL_DEFAULT = "https://pgmxbogkgnpekjoolgte.supabase.co";  // prefilled from you
-const SB_KEY_DEFAULT = "PASTE-YOUR-ANON-KEY";                       // <-- paste anon public key here
+const SB_KEY_DEFAULT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBnbXhib2drZ25wZWtqb29sZ3RlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU0MDEzNzIsImV4cCI6MjA3MDk3NzM3Mn0.DePl3SELtw06yueZJQPvXYTmUEnz9WC-iCaXreCXUQ8";                       // <-- paste anon public key here
 
 function getSbUrl(){ return SB_CFG.url || SB_URL_DEFAULT; }
 function getSbKey(){ return SB_CFG.key || SB_KEY_DEFAULT; }

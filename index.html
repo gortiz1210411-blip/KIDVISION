@@ -97,7 +97,7 @@ select option { line-height:1.2; padding:6px 8px; }
       <button class="tab" data-tab="records">Records</button>
       <button class="tab" data-tab="student">Student View</button>
       <button class="tab" data-tab="settings">Settings</button>
-      <button class="tab" data-tab="admin" id="adminTab" style="display:none">Admin</button>
+      <button class="tab" data-tab="admin" id="adminTab">Admin</button>
     </div>
   </header>
 
@@ -187,6 +187,7 @@ select option { line-height:1.2; padding:6px 8px; }
     <hr class="split">
 
     <h3>Access control (Supabase)</h3>
+    <div class="row"><button id="ownerLoginBtnSettings">Owner login</button><small class="note">Opens admin login overlay</small></div>
     <div class="row">
       <input id="sbUrl" placeholder="Supabase URL" style="flex:1">
       <input id="sbKey" placeholder="Supabase anon public key" type="password" style="flex:1">
@@ -202,6 +203,7 @@ select option { line-height:1.2; padding:6px 8px; }
       <small class="note">Use your private admin password (stored in Supabase).</small>
     </div>
     <div id="adminPanel" style="display:none">
+      <div class="row" style="margin-bottom:8px"><button id="adminLogout" style="background:#2a0e12;border-color:#5e1921">Admin logout</button><small class="note">Locks Admin tab on this browser</small></div>
       <div class="row" style="margin-bottom:8px">
         <button id="refreshCodes">Refresh codes</button>
         <input id="newCode" placeholder="Invite code (e.g., KIDV-25-ABCD-1234)" style="flex:1">
@@ -393,6 +395,29 @@ async function adminReset(codeEnc){ const code=decodeURIComponent(codeEnc); try{
   document.getElementById('subjectSelect').addEventListener('change', renderStandards);
   document.getElementById('standardSelect').addEventListener('change', renderSubskills);
   document.getElementById('saveBtn').addEventListener('click', saveRecord);
+})();
+
+
+// Extra hook: open Owner Login from Settings
+(function(){
+  const btn = document.getElementById('ownerLoginBtnSettings');
+  if(btn){ btn.addEventListener('click', ()=>{
+    const ov = document.getElementById('ownerOverlay');
+    if(ov) ov.style.display='flex';
+  });}
+})();
+
+
+// Admin logout
+(function(){
+  const out = document.getElementById('adminLogout');
+  if(out){
+    out.addEventListener('click', ()=>{
+      localStorage.removeItem('kv_admin');
+      alert('Logged out of Admin on this browser.');
+      location.reload();
+    });
+  }
 })();
 
 // Service worker

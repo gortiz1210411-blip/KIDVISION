@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -10,60 +9,64 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="KidVision">
 <link rel="apple-touch-icon" href="icon-192.png">
-<script defer src="https://alcdn.msauth.net/browser/2.38.2/js/msal-browser.min.js"></script>
 <style>
-:root { --bg:#0a0e1a; --card:#121a32; --accent:#0ab0f5; --accent2:#ff2b75; --muted:#9fb0d0; --line:#1e2a49; }
-* { box-sizing:border-box }
-html,body { margin:0; height:100%; font-family:system-ui,-apple-system,Inter,Segoe UI,Roboto,Arial; color:#e6f0ff; }
-body { background: linear-gradient(135deg, #0a0e1a, #000000); background-attachment: fixed; }
-body::before { content:""; position:fixed; inset:0; background:url('kidvision_logo.png') center/40% no-repeat; opacity:.18; z-index:-1; }
-.app { max-width:980px; margin:0 auto; padding:14px }
-header { display:flex; align-items:center; gap:8px; justify-content:space-between; margin-bottom:10px }
-.brand { font-weight:800; letter-spacing:.2px }
-.tabs { display:flex; gap:6px; flex-wrap:wrap }
-.tab { border:1px solid var(--line); background:#0f1832; border-radius:999px; padding:6px 10px; color:#cfe2ff; cursor:pointer }
-.tab.active { background:#243152; color:#fff; border-color:#3a4a74 }
-.card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:12px; box-shadow:0 10px 26px rgba(0,0,0,.25) }
-.row { display:flex; gap:8px; align-items:center; flex-wrap:wrap }
-input,select,textarea,button { background:#0d152b; border:1px solid var(--line); color:#e6f0ff; border-radius:10px; padding:10px 12px; font-size:16px }
-button { background: var(--accent); }
-button:hover { background: var(--accent2); }
-textarea { width:100%; min-height:80px }
-h3 { margin:0 0 8px 0 }
-small.note, small.muted { color:#9fb0d0 }
-table { width:100%; border-collapse:collapse }
-th,td { border-bottom:1px solid var(--line); padding:8px 6px; text-align:left; vertical-align:top }
-th { position:sticky; top:0; background:#0f1832; z-index:1 }
-.right { margin-left:auto }
-.badge { border:1px solid var(--line); padding:2px 8px; border-radius:999px; color:#bcd1ff; font-size:12px }
-.section { display:none }
-.section.active { display:block }
+:root {{ --bg:#0a0e1a; --card:#121a32; --accent:#0ab0f5; --accent2:#ff2b75; --muted:#9fb0d0; --line:#1e2a49; }}
+* {{ box-sizing:border-box }}
+html,body {{ margin:0; height:100%; font-family:system-ui,-apple-system,Inter,Segoe UI,Roboto,Arial; color:#e6f0ff; }}
+body {{ background: linear-gradient(135deg, #0a0e1a, #000000); background-attachment: fixed; }}
+.app {{ max-width:980px; margin:0 auto; padding:14px 14px 80px; position:relative; min-height:100vh; }}
+header {{ display:flex; align-items:center; gap:8px; justify-content:space-between; margin-bottom:10px }}
+.brand {{ font-weight:800; letter-spacing:.2px }}
+.tabs {{ display:flex; gap:6px; flex-wrap:wrap }}
+.tab {{ border:1px solid var(--line); background:#0f1832; border-radius:999px; padding:6px 10px; color:#cfe2ff; cursor:pointer; user-select:none }}
+.tab.active {{ background:#243152; color:#fff; border-color:#3a4a74 }}
+.card {{ background:var(--card); border:1px solid var(--line); border-radius:16px; padding:12px; box-shadow:0 10px 26px rgba(0,0,0,.25) }}
+.row {{ display:flex; gap:8px; align-items:center; flex-wrap:wrap }}
+input,select,textarea,button {{ background:#0d152b; border:1px solid var(--line); color:#e6f0ff; border-radius:10px; padding:10px 12px; font-size:16px }}
+button {{ background: var(--accent); }}
+button:hover {{ background: var(--accent2); }}
+textarea {{ width:100%; min-height:80px }}
+h3 {{ margin:0 0 8px 0 }}
+small.note, small.muted {{ color:#9fb0d0 }}
+table {{ width:100%; border-collapse:collapse }}
+th,td {{ border-bottom:1px solid var(--line); padding:8px 6px; text-align:left; vertical-align:top }}
+th {{ position:sticky; top:0; background:#0f1832; z-index:1 }}
+.right {{ margin-left:auto }}
+.badge {{ border:1px solid var(--line); padding:2px 8px; border-radius:999px; color:#bcd1ff; font-size:12px }}
+.section {{ display:none }}
+.section.active {{ display:block }}
 
 /* Dropdown overflow fix */
-select, .dropdown { max-width:100%; white-space:normal; overflow-wrap:break-word; }
-select { max-height:220px; overflow-y:auto; }
-select option { line-height:1.2; padding:6px 8px; }
+select, .dropdown {{ max-width:100%; white-space:normal; overflow-wrap:break-word; }}
+select {{ max-height:220px; overflow-y:auto; }}
+select option {{ line-height:1.2; padding:6px 8px; }}
 
 /* Access Gate overlay */
-#gateOverlay{position:fixed;inset:0;background:rgba(5,8,18,.96);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:9999}
-#gateCard{background:#151b2f;border:1px solid #26335b;border-radius:16px;padding:16px;max-width:480px;width:92%;box-shadow:0 15px 40px rgba(0,0,0,.45);}
-#gateCard h2{margin:0 0 8px 0}
-#gateCard p{color:#9fb0d0;margin:0 0 12px 0}
-#gateCard input{width:100%;margin:6px 0 10px 0;background:#0e1630;border:1px solid #26335b;color:#e6f0ff;border-radius:10px;padding:10px 12px}
-#gateCard button{width:100%;padding:10px 14px;border-radius:12px;background:#0ab0f5;border:1px solid #3a9dd4;color:#fff;font-weight:600}
-#gateCard small{display:block;color:#9fb0d0;margin-top:8px;text-align:center}
-#gateErr{color:#ff6f91;min-height:18px;margin-bottom:6px}
+#gateOverlay{{position:fixed;inset:0;background:rgba(5,8,18,.96);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:9999}}
+#gateCard{{background:#151b2f;border:1px solid #26335b;border-radius:16px;padding:16px;max-width:480px;width:92%;box-shadow:0 15px 40px rgba(0,0,0,.45);}}
+#gateCard h2{{margin:0 0 8px 0}}
+#gateCard p{{color:#9fb0d0;margin:0 0 12px 0}}
+#gateCard input{{width:100%;margin:6px 0 10px 0;background:#0e1630;border:1px solid #26335b;color:#e6f0ff;border-radius:10px;padding:10px 12px}}
+#gateCard button{{width:100%;padding:10px 14px;border-radius:12px;background:#0ab0f5;border:1px solid #3a9dd4;color:#fff;font-weight:600}}
+#gateCard small{{display:block;color:#9fb0d0;margin-top:8px;text-align:center}}
+#gateErr{{color:#ff6f91;min-height:18px;margin-bottom:6px}}
 
 /* Owner Login overlay */
-#ownerOverlay{position:fixed;inset:0;background:rgba(5,8,18,.96);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:9999}
-#ownerCard{background:#151b2f;border:1px solid #26335b;border-radius:16px;padding:16px;max-width:420px;width:92%;box-shadow:0 15px 40px rgba(0,0,0,.45)}
-#ownerCard h2{margin:0 0 8px 0}
-#ownerCard input{width:100%;margin:6px 0 10px 0;background:#0e1630;border:1px solid #26335b;color:#e6f0ff;border-radius:10px;padding:10px 12px}
-#ownerCard button{width:100%;padding:10px 14px;border-radius:12px;background:#0ab0f5;border:1px solid #3a9dd4;color:#fff;font-weight:600}
-#ownerErr{color:#ff6f91;min-height:18px;margin-bottom:6px}
+#ownerOverlay{{position:fixed;inset:0;background:rgba(5,8,18,.96);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:9999}}
+#ownerCard{{background:#151b2f;border:1px solid #26335b;border-radius:16px;padding:16px;max-width:420px;width:92%;box-shadow:0 15px 40px rgba(0,0,0,.45)}}
+#ownerCard h2{{margin:0 0 8px 0}}
+#ownerCard input{{width:100%;margin:6px 0 10px 0;background:#0e1630;border:1px solid #26335b;color:#e6f0ff;border-radius:10px;padding:10px 12px}}
+#ownerCard button{{width:100%;padding:10px 14px;border-radius:12px;background:#0ab0f5;border:1px solid #3a9dd4;color:#fff;font-weight:600}}
+#ownerErr{{color:#ff6f91;min-height:18px;margin-bottom:6px}}
+
+/* Footer logo pinned to bottom center */
+.footer-logo {{ position:fixed; left:0; right:0; bottom:8px; display:flex; justify-content:center; pointer-events:none; }}
+.footer-logo img {{ width:140px; opacity:.85; filter: drop-shadow(0 6px 18px rgba(0,0,0,.35)); }}
 </style>
 </head>
 <body>
+
+<!-- Access gate -->
 <div id="gateOverlay">
   <div id="gateCard">
     <h2>Restricted Access</h2>
@@ -76,6 +79,7 @@ select option { line-height:1.2; padding:6px 8px; }
   </div>
 </div>
 
+<!-- Owner login overlay -->
 <div id="ownerOverlay">
   <div id="ownerCard">
     <h2>Owner Login</h2>
@@ -92,7 +96,7 @@ select option { line-height:1.2; padding:6px 8px; }
       <span class="brand">KidVision Standards Tracker</span>
       <span class="badge">Local & Offline</span>
     </div>
-    <div class="tabs">
+    <div class="tabs" id="tabs">
       <button class="tab active" data-tab="quick">Quick Rate</button>
       <button class="tab" data-tab="records">Records</button>
       <button class="tab" data-tab="student">Student View</button>
@@ -187,41 +191,18 @@ select option { line-height:1.2; padding:6px 8px; }
     <hr class="split">
 
     <h3>Access control (Supabase)</h3>
-    <div class="row"><button id="ownerLoginBtnSettings">Owner login</button><small class="note">Opens admin login overlay</small></div>
     <div class="row">
       <input id="sbUrl" placeholder="Supabase URL" style="flex:1">
       <input id="sbKey" placeholder="Supabase anon public key" type="password" style="flex:1">
       <button id="saveSb">Save</button>
+      <button id="ownerLoginBtnSettings">Owner login</button>
     </div>
-    <small class="note">Project URL prefilled. Anon key stored locally. RPCs: <code>redeem_code</code> + admin RPCs.</small>
-  </section>
-
-  <section id="admin" class="section card">
-    <h3>Owner Admin</h3>
-    <div id="adminLocked" class="row" style="margin-bottom:8px">
-      <button id="ownerLoginBtn">Owner login</button>
-      <small class="note">Use your private admin password (stored in Supabase).</small>
-    </div>
-    <div id="adminPanel" style="display:none">
-      <div class="row" style="margin-bottom:8px"><button id="adminLogout" style="background:#2a0e12;border-color:#5e1921">Admin logout</button><small class="note">Locks Admin tab on this browser</small></div>
-      <div class="row" style="margin-bottom:8px">
-        <button id="refreshCodes">Refresh codes</button>
-        <input id="newCode" placeholder="Invite code (e.g., KIDV-25-ABCD-1234)" style="flex:1">
-        <input id="newEmail" placeholder="Email (optional)" style="flex:1">
-        <button id="addCode">Add</button>
-      </div>
-      <small class="note">Codes are case-insensitive; spaces trimmed. Stored uppercase.</small>
-      <div style="max-height:420px;overflow:auto">
-        <table id="codesTable">
-          <thead>
-            <tr><th>Code</th><th>Email</th><th>Redeemed</th><th>Redeemed at</th><th>By</th><th>Action</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
+    <small class="note">URL prefilled. RPCs used: <code>redeem_code</code> + admin_*.</small>
   </section>
 </div>
+
+<!-- Footer logo -->
+<div class="footer-logo"><img src="kidvision_logo.png" alt="KidVision logo"></div>
 
 <script>
 // ===== App State =====
@@ -231,18 +212,21 @@ let STUDENTS = JSON.parse(localStorage.getItem('fl_students')||'[]');
 let RECORDS = JSON.parse(localStorage.getItem('fl_records')||'[]');
 let SETTINGS = JSON.parse(localStorage.getItem('fl_settings')||'{}');
 
-// Preconfigured Supabase
+// Supabase preconfig
 let SB_CFG = JSON.parse(localStorage.getItem('kv_supabase_cfg')||'{}');
-const SB_URL_DEFAULT = "https://pgmxbogkgnpekjoolgte.supabase.co"; // your project
+const SB_URL_DEFAULT = "https://pgmxbogkgnpekjoolgte.supabase.co";
 const SB_KEY_DEFAULT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBnbXhib2drZ25wZWtqb29sZ3RlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU0MDEzNzIsImV4cCI6MjA3MDk3NzM3Mn0.DePl3SELtw06yueZJQPvXYTmUEnz9WC-iCaXreCXUQ8";
-
 function getSbUrl(){ return SB_CFG.url || SB_URL_DEFAULT; }
 function getSbKey(){ return SB_CFG.key || SB_KEY_DEFAULT; }
 
-// ===== Tabs =====
-const tabs = document.querySelectorAll('.tab');
-const sections = document.querySelectorAll('.section');
-tabs.forEach(t=>t.addEventListener('click',()=>{ tabs.forEach(b=>b.classList.remove('active')); t.classList.add('active'); sections.forEach(s=>s.classList.remove('active')); document.getElementById(t.dataset.tab).classList.add('active'); if(t.dataset.tab==='records') renderTable(); if(t.dataset.tab==='student') renderStudentView(); }));
+// ===== Tabs (robust) =====
+(function(){ 
+  const tabs = document.querySelectorAll('.tab');
+  const sections = document.querySelectorAll('.section');
+  function activate(id){ sections.forEach(s=>s.classList.toggle('active', s.id===id)); tabs.forEach(t=>t.classList.toggle('active', t.dataset.tab===id)); }
+  tabs.forEach(t=>t.addEventListener('click', ()=>activate(t.dataset.tab)));
+  activate('quick');
+})();
 
 // ===== Elements =====
 const studentSelect = document.getElementById('studentSelect');
@@ -260,33 +244,30 @@ const filterRating = document.getElementById('filterRating');
 const tbody = document.querySelector('#dataTable tbody');
 const studentViewSelect = document.getElementById('studentViewSelect');
 const studentTableBody = document.querySelector('#studentTable tbody');
-
 const sbUrl = document.getElementById('sbUrl');
 const sbKey = document.getElementById('sbKey');
 const saveSb = document.getElementById('saveSb');
-
 const hideNamesEl = document.getElementById('hideNames');
 const useInitialsEl = document.getElementById('useInitials');
 const adminTab = document.getElementById('adminTab');
 
 // ===== Helpers =====
-function setToday(){ const d=new Date(); const iso=d.toISOString().slice(0,10); const el=document.getElementById('dateInput'); if(el) el.value=iso; } setToday();
+function setToday(){ const d=new Date(); const iso=d.toISOString().slice(0,10); if(dateInput) dateInput.value=iso; } setToday();
 function masked(name){ if(!hideNamesEl.checked) return name; if(useInitialsEl.checked){ const parts=(name||'').trim().split(/\s+/); return parts.map(p=>p[0]?.toUpperCase()||'').join(''); } return 'Student'; }
 
 function renderStudents(){
   studentSelect.innerHTML = '<option value="">' + (STUDENTS.length?'Select student…':'No students yet') + '</option>' + STUDENTS.map((s,i)=>`<option value="${i}">${masked(s.name)}</option>`).join('');
   studentViewSelect.innerHTML = '<option value="">Choose student…</option>' + STUDENTS.map((s,i)=>`<option value="${i}">${masked(s.name)}</option>`).join('');
-  const sc = document.getElementById('studentCount'); if(sc) sc.textContent = STUDENTS.length ? `${STUDENTS.length} students` : 'No students yet';
+  const sc=document.getElementById('studentCount'); if(sc) sc.textContent = STUDENTS.length ? `${STUDENTS.length} students` : 'No students yet';
   localStorage.setItem('fl_students', JSON.stringify(STUDENTS));
 }
 function renderSubjects(){
   subjectSelect.innerHTML = SUBJECTS.map(s=>`<option value="${s}">${s}</option>`).join('');
   filterSubject.innerHTML = '<option value="">All</option>' + SUBJECTS.map(s=>`<option value="${s}">${s}</option>`).join('');
 }
-function getStandardsForSubject(subj){ return STANDARDS[subj] || []; }
+function getStandardsForSubject(subj){ return (STANDARDS[subj]||[]); }
 function renderStandards(){
-  const subj = subjectSelect.value || SUBJECTS[0];
-  subjectSelect.value = subj;
+  const subj = subjectSelect.value || SUBJECTS[0]; subjectSelect.value=subj;
   const list = getStandardsForSubject(subj);
   const q = (standardSearch.value||'').toLowerCase();
   const filtered = list.filter(x => (x.code+' '+x.desc).toLowerCase().includes(q));
@@ -304,124 +285,146 @@ function renderSubskills(){
 ratingGroup.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{ ratingGroup.querySelectorAll('button').forEach(x=>x.style.borderColor='var(--line)'); b.style.borderColor='var(--accent)'; ratingGroup.dataset.value=b.dataset.v; }));
 
 function saveRecord(){
-  const sIdx = studentSelect.value; const subj = subjectSelect.value; const stdIdx = standardSelect.value; const subIdx = subskillSelect.value; const rating = parseInt(ratingGroup.dataset.value||'0',10); const note = (notesEl.value||'').trim();
-  if(sIdx==='') return alert('Choose a student');
-  if(!subj) return alert('Choose a subject');
-  if(stdIdx==='') return alert('Choose a standard');
-  if(!rating) return alert('Pick 1–5');
+  const sIdx = studentSelect.value; const subj=subjectSelect.value; const stdIdx=standardSelect.value; const subIdx=subskillSelect.value; const rating=parseInt(ratingGroup.dataset.value||'0',10); const note=(notesEl.value||'').trim();
+  if(sIdx==='') return alert('Choose a student'); if(!subj) return alert('Choose a subject'); if(stdIdx==='') return alert('Choose a standard'); if(!rating) return alert('Pick 1–5');
   const std = getStandardsForSubject(subj)[stdIdx];
   const subskill = (subIdx==='') ? '' : (std.subskills||[])[subIdx]||'';
   const rec = {date: dateInput.value, student: STUDENTS[sIdx].name, subject: subj, code: std.code, standard: std.desc, subskill, rating, notes: note};
-  RECORDS.push(rec);
-  localStorage.setItem('fl_records', JSON.stringify(RECORDS));
+  RECORDS.push(rec); localStorage.setItem('fl_records', JSON.stringify(RECORDS));
   notesEl.value=''; ratingGroup.dataset.value=''; ratingGroup.querySelectorAll('button').forEach(x=>x.style.borderColor='var(--line)');
   alert('Saved');
 }
 
-function csvFrom(records){ const header=["date","student","subject","code","standard","subskill","rating","notes"]; const lines=[header.join(',')].concat(records.map(r=>header.map(h=>'"'+String(r[h]||'').replace(/"/g,'""')+'"').join(','))); return lines.join('\n'); }
-document.getElementById('exportBtn').addEventListener('click', ()=>{ const blob=new Blob([csvFrom(RECORDS)],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='kidvision-records.csv'; a.click(); });
-document.getElementById('studentExport').addEventListener('click', ()=>{ const idx=studentViewSelect.value; if(idx==='') return alert('Choose a student'); const target=STUDENTS[idx]?.name||''; const rows=RECORDS.filter(r=>r.student===target); const blob=new Blob([csvFrom(rows)],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='kidvision-'+(target||'student')+'.csv'; a.click(); });
+function renderTable(){
+  const fs=(filterStudent.value||'').toLowerCase(); const fc=(filterCode.value||'').toLowerCase(); const fsub=filterSubject.value; const frat=filterRating.value;
+  const rows = RECORDS.filter(r => (!fs || (r.student||'').toLowerCase().includes(fs)) && (!fc || ((r.code+' '+r.standard+' '+(r.subskill||'')).toLowerCase().includes(fc))) && (!fsub || r.subject===fsub) && (!frat || String(r.rating)===frat) );
+  tbody.innerHTML = rows.map((r,i)=>`<tr><td>${r.date}</td><td>${r.student}</td><td>${r.subject}</td><td>${r.code}</td><td>${r.standard}</td><td>${r.subskill||''}</td><td>${r.rating}</td><td>${(r.notes||'').replace(/</g,'&lt;')}</td><td><button data-del="${i}">Delete</button></td></tr>`).join('');
+}
+function renderStudentView(){
+  const idx=studentViewSelect.value; const target = (idx===''?null:STUDENTS[idx]?.name); const rows = target? RECORDS.filter(r=>r.student===target) : []; 
+  studentTableBody.innerHTML = rows.map((r,i)=>`<tr><td>${r.date}</td><td>${r.subject}</td><td>${r.code}</td><td>${r.standard}</td><td>${r.subskill||''}</td><td>${r.rating}</td><td>${(r.notes||'').replace(/</g,'&lt;')}</td><td><button data-sdel="${i}">Delete</button></td></tr>`).join('');
+}
 
+// Events
+document.getElementById('saveBtn').addEventListener('click', saveRecord);
+['input','change'].forEach(ev=>{ standardSearch.addEventListener(ev, renderStandards); });
+subjectSelect.addEventListener('change', renderStandards);
+standardSelect.addEventListener('change', renderSubskills);
+filterStudent.addEventListener('input', renderTable);
+filterCode.addEventListener('input', renderTable);
+filterSubject.addEventListener('change', renderTable);
+filterRating.addEventListener('change', renderTable);
+document.getElementById('exportBtn').addEventListener('click', ()=>{ const header=["date","student","subject","code","standard","subskill","rating","notes"]; const lines=[header.join(',')].concat(RECORDS.map(r=>header.map(h=>'"'+String(r[h]||'').replace(/"/g,'""')+'"').join(','))); const blob=new Blob([lines.join('\n')],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='kidvision-records.csv'; a.click(); });
+document.getElementById('studentExport').addEventListener('click', ()=>{ const idx=studentViewSelect.value; if(idx==='') return alert('Choose a student'); const target=STUDENTS[idx]?.name||''; const rows=RECORDS.filter(r=>r.student===target); const header=["date","student","subject","code","standard","subskill","rating","notes"]; const lines=[header.join(',')].concat(rows.map(r=>header.map(h=>'"'+String(r[h]||'').replace(/"/g,'""')+'"').join(','))); const blob=new Blob([lines.join('\n')],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='kidvision-'+(target||'student')+'.csv'; a.click(); });
+
+// Student add/clear
 document.getElementById('addStudentBtn').addEventListener('click', ()=>{ const name=document.getElementById('newStudentName').value.trim(); if(!name) return alert('Enter a name'); STUDENTS.push({name}); document.getElementById('newStudentName').value=''; renderStudents(); });
 document.getElementById('clearStudentsBtn').addEventListener('click', ()=>{ if(!confirm('Delete all students?')) return; STUDENTS=[]; renderStudents(); });
 
-// Roster import
+// Roster import (simple CSV with 'name')
 (function(){
-  const studentCSV=document.getElementById('studentCSV'); const importBtn=document.getElementById('importStudentsBtn'); const tmplBtn=document.getElementById('downloadTemplateBtn');
-  if(tmplBtn) tmplBtn.addEventListener('click', ()=>{ const tmpl='name\nAlice Johnson\nBob Smith\n'; const blob=new Blob([tmpl],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='roster-template.csv'; a.click(); });
-  function normalizeHeader(h){ return String(h).replace(/^[\"\']|[\"\']$/g,"").replace(/^\uFEFF|^\ufeff/,"").trim().toLowerCase(); }
-  function splitLine(line){ if(line.indexOf(",")===-1 && line.indexOf("\t")!==-1) return line.split("\t"); return line.split(","); }
-  async function importRoster(){ const f=studentCSV&&studentCSV.files?studentCSV.files[0]:null; if(!f) return alert('Choose a CSV file first.'); let text=await f.text(); text=text.replace(/\r\n/g,"\n").replace(/\r/g,"\n"); const lines=text.split("\n").filter(r=>r.trim().length); if(!lines.length) return alert('CSV is empty.'); let headers=splitLine(lines[0]).map(normalizeHeader); if(headers.length===1 && headers[0]==="") headers[0]="name"; let nameIdx=headers.findIndex(h=>h==="name"||h==="student"||h==="student name"); if(nameIdx===-1) return alert('CSV needs a "name" column in the header.'); const out=[]; for(let i=1;i<lines.length;i++){{ const cols=splitLine(lines[i]); const nm=(cols[nameIdx]||'').trim(); if(nm) out.push({{name:nm}}); }} if(!out.length) return alert('No student names found.'); STUDENTS = out; renderStudents(); alert('Roster imported: '+out.length+' students'); }
-  if(importBtn) importBtn.addEventListener('click', importRoster);
+  const fileEl=document.getElementById('studentCSV'); const btn=document.getElementById('importStudentsBtn'); const tmpl=document.getElementById('downloadTemplateBtn');
+  if(tmpl) tmpl.addEventListener('click', ()=>{ const txt='name\nAlice Johnson\nBob Smith\n'; const blob=new Blob([txt],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='roster-template.csv'; a.click(); });
+  btn.addEventListener('click', async ()=>{ const f=fileEl.files&&fileEl.files[0]; if(!f) return alert('Choose a CSV file first'); let text=await f.text(); text=text.replace(/\r\n/g,'\n').replace(/\r/g,'\n'); const lines=text.split('\n').filter(x=>x.trim().length); if(!lines.length) return alert('CSV empty'); const headers=(lines[0]||'').split(',').map(x=>x.replace(/^\uFEFF|^\ufeff/,'').trim().toLowerCase()); let idx=headers.indexOf('name'); if(idx<0) idx=0; const rows=lines.slice(1).map(r=>r.split(',')); let added=0; rows.forEach(r=>{ const name=(r[idx]||'').trim(); if(name){ STUDENTS.push({name}); added++; } }); renderStudents(); alert('Imported '+added+' students'); });
 })();
 
 // ===== Supabase RPC helpers =====
 async function redeemInvite(code, email){
-  const url = getSbUrl(); const key = getSbKey();
-  try {
-    const resp = await fetch(`${url}/rest/v1/rpc/redeem_code`, { method:'POST', headers: { 'apikey': key, 'Authorization':'Bearer '+key, 'Content-Type':'application/json' }, body: JSON.stringify({ input_code: code, input_email: email }) });
-    if(!resp.ok){ console.error('RPC error', resp.status, await resp.text()); setGateErr('Server error.'); return false; }
-    const ok = await resp.json(); return !!ok;
-  } catch(e) { console.error('RPC network', e); setGateErr('Network error.'); return false; }
+  const url=getSbUrl(); const key=getSbKey();
+  try{ const resp=await fetch(`${url}/rest/v1/rpc/redeem_code`, {method:'POST', headers:{'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json'}, body:JSON.stringify({input_code:code, input_email:email})}); if(!resp.ok){ console.error('RPC error', resp.status, await resp.text()); setGateErr('Server error.'); return false; } const ok=await resp.json(); return !!ok; }catch(e){ console.error('RPC net', e); setGateErr('Network error.'); return false; }
 }
 
-// ===== Access Gate behavior (client normalization) =====
+// ===== Access Gate behavior (with normalization) =====
 function setGateErr(msg){ const el=document.getElementById('gateErr'); if(el) el.textContent=msg; }
 async function validateGate(){
-  const email = (document.getElementById('gateEmail').value||'').trim();
-  const rawCode = (document.getElementById('gateCode').value||'');
-  const code = rawCode.trim().toUpperCase(); // normalize
+  const email=(document.getElementById('gateEmail').value||'').trim();
+  const rawCode=(document.getElementById('gateCode').value||'');
+  const code=rawCode.trim().toUpperCase();
   if(!email) return setGateErr('Enter your email.');
   if(!code) return setGateErr('Enter your invite code.');
-  const ok = await redeemInvite(code, email);
+  const ok=await redeemInvite(code, email);
   if(ok){ localStorage.setItem('kv_access_granted','1'); document.getElementById('gateOverlay').style.display='none'; }
   else setGateErr('Invalid or already redeemed code.');
 }
-(function(){
-  const btn=document.getElementById('gateSubmit'); if(btn) btn.addEventListener('click', validateGate);
-  const codeInput=document.getElementById('gateCode'); if(codeInput) codeInput.addEventListener('keydown', e=>{ if(e.key==='Enter') validateGate(); });
-  if(localStorage.getItem('kv_access_granted')!=='1'){ const ov=document.getElementById('gateOverlay'); if(ov) ov.style.display='flex'; }
-})();
+(function(){ const btn=document.getElementById('gateSubmit'); if(btn) btn.addEventListener('click', validateGate); const ci=document.getElementById('gateCode'); if(ci) ci.addEventListener('keydown', e=>{ if(e.key==='Enter') validateGate(); }); if(localStorage.getItem('kv_access_granted')!=='1'){ const ov=document.getElementById('gateOverlay'); if(ov) ov.style.display='flex'; } })();
 
 // ===== Admin (RPC-protected) =====
 let ADMIN_PW = null;
-function showAdminTabIfUnlocked(){ const isAdmin=localStorage.getItem('kv_admin')==='1'; if(adminTab) adminTab.style.display = isAdmin ? 'inline-block' : 'none'; const locked=document.getElementById('adminLocked'); const panel=document.getElementById('adminPanel'); if(locked&&panel){ locked.style.display=isAdmin?'none':'flex'; panel.style.display=isAdmin?'block':'none'; } }
+function showAdminTabIfUnlocked(){ const isAdmin=localStorage.getItem('kv_admin')==='1'; const locked=document.getElementById('adminLocked'); const panel=document.getElementById('adminPanel'); if(locked&&panel){ locked.style.display=isAdmin?'none':'flex'; panel.style.display=isAdmin?'block':'none'; } }
 async function rpc(name, body){ const url=getSbUrl(), key=getSbKey(); const r=await fetch(`${url}/rest/v1/rpc/${name}`,{method:'POST',headers:{'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json'},body:JSON.stringify(body||{})}); if(!r.ok) throw new Error(name+' failed: '+r.status+' '+await r.text()); const ct=r.headers.get('content-type')||''; return ct.includes('application/json')?await r.json():null; }
 function setOwnerErr(msg){ const el=document.getElementById('ownerErr'); if(el) el.textContent=msg; }
-async function ownerLoginFlow(){ const pw=(document.getElementById('ownerPass').value||'').trim(); if(!pw) return setOwnerErr('Enter your admin password.'); try{ const ok=await rpc('admin_auth',{pw}); if(ok===true||ok===1){ ADMIN_PW=pw; localStorage.setItem('kv_admin','1'); document.getElementById('ownerOverlay').style.display='none'; showAdminTabIfUnlocked(); await refreshCodes(); } else setOwnerErr('Incorrect password.'); }catch(e){ setOwnerErr('Server error: '+e.message); } }
-async function refreshCodes(){ try{ const rows=await rpc('admin_list_codes',{pw:ADMIN_PW}); const tb=document.querySelector('#codesTable tbody'); tb.innerHTML=(rows||[]).map(r=>`<tr><td>${r.code}</td><td>${r.email||''}</td><td>${r.redeemed?'Yes':'No'}</td><td>${r.redeemed_at||''}</td><td>${r.redeemed_by||''}</td><td><button onclick="adminReset('${encodeURIComponent(r.code)}')">Reset</button> <button onclick="adminDelete('${encodeURIComponent(r.code)}')">Delete</button></td></tr>`).join(''); }catch(e){ alert('Refresh failed: '+e.message); } }
-async function adminAdd(){ let code=(document.getElementById('newCode').value||''); code=code.trim().toUpperCase(); const email=(document.getElementById('newEmail').value||'').trim(); if(!code) return alert('Enter a code'); try{ const ok=await rpc('admin_add_code',{pw:ADMIN_PW,code,email}); if(ok===true||ok===1){ document.getElementById('newCode').value=''; document.getElementById('newEmail').value=''; await refreshCodes(); } else alert('Add failed.'); }catch(e){ alert('Add failed: '+e.message); } }
-async function adminDelete(codeEnc){ const code=decodeURIComponent(codeEnc); if(!confirm('Delete this code?')) return; try{ const ok=await rpc('admin_delete_code',{pw:ADMIN_PW,code}); if(ok===true||ok===1) await refreshCodes(); else alert('Delete failed.'); }catch(e){ alert('Delete failed: '+e.message); } }
-async function adminReset(codeEnc){ const code=decodeURIComponent(codeEnc); try{ const ok=await rpc('admin_reset_code',{pw:ADMIN_PW,code}); if(ok===true||ok===1) await refreshCodes(); else alert('Reset failed.'); }catch(e){ alert('Reset failed: '+e.message); } }
 
-(function(){
-  const adminBtn=document.getElementById('adminTab'); if(adminBtn) adminBtn.addEventListener('click', ()=>{ document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active')); adminBtn.classList.add('active'); document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); document.getElementById('admin').classList.add('active'); });
-  const loginBtn=document.getElementById('ownerLoginBtn'); if(loginBtn) loginBtn.addEventListener('click', ()=>{ document.getElementById('ownerOverlay').style.display='flex'; });
-  const ownerSubmit=document.getElementById('ownerSubmit'); if(ownerSubmit) ownerSubmit.addEventListener('click', ownerLoginFlow);
-  const passInput=document.getElementById('ownerPass'); if(passInput) passInput.addEventListener('keydown', e=>{ if(e.key==='Enter') ownerLoginFlow(); });
-  const addBtn=document.getElementById('addCode'); if(addBtn) addBtn.addEventListener('click', adminAdd);
-  const refBtn=document.getElementById('refreshCodes'); if(refBtn) refBtn.addEventListener('click', refreshCodes);
+(function(){ // inject admin section at runtime
+  const container = document.createElement('section');
+  container.id = "admin"; container.className="section card";
+  container.innerHTML = `
+    <h3>Owner Admin</h3>
+    <div id="adminLocked" class="row" style="margin-bottom:8px">
+      <button id="ownerLoginBtn">Owner login</button>
+      <small class="note">Use your private admin password (stored in Supabase).</small>
+    </div>
+    <div id="adminPanel" style="display:none">
+      <div class="row" style="margin-bottom:8px">
+        <button id="refreshCodes">Refresh codes</button>
+        <input id="newCode" placeholder="Invite code (e.g., KIDV-25-ABCD-1234)" style="flex:1">
+        <input id="newEmail" placeholder="Email (optional)" style="flex:1">
+        <button id="addCode">Add</button>
+        <button id="adminLogout" style="background:#2a0e12;border-color:#5e1921">Admin logout</button>
+      </div>
+      <small class="note">Codes are case-insensitive; spaces trimmed. Stored uppercase.</small>
+      <div style="max-height:420px;overflow:auto">
+        <table id="codesTable">
+          <thead><tr><th>Code</th><th>Email</th><th>Redeemed</th><th>Redeemed at</th><th>By</th><th>Action</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>`;
+  document.querySelector('.app').appendChild(container);
 
-  // Settings prefill
-  if(sbUrl) sbUrl.value = SB_CFG.url || SB_URL_DEFAULT;
-  if(sbKey) sbKey.value = SB_CFG.key || '';
-  if(saveSb) saveSb.addEventListener('click', ()=>{ SB_CFG={url:sbUrl.value.trim(), key:sbKey.value.trim()}; localStorage.setItem('kv_supabase_cfg', JSON.stringify(SB_CFG)); alert('Saved. Reloading…'); location.reload(); });
+  document.getElementById('adminTab').addEventListener('click', ()=>{ 
+    document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+    document.getElementById('adminTab').classList.add('active');
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    container.classList.add('active');
+  });
 
-  renderStudents(); renderSubjects(); renderStandards();
-  showAdminTabIfUnlocked();
-
-  // Handlers
-  document.getElementById('standardSearch').addEventListener('input', renderStandards);
-  document.getElementById('subjectSelect').addEventListener('change', renderStandards);
-  document.getElementById('standardSelect').addEventListener('change', renderSubskills);
-  document.getElementById('saveBtn').addEventListener('click', saveRecord);
-})();
-
-
-// Extra hook: open Owner Login from Settings
-(function(){
-  const btn = document.getElementById('ownerLoginBtnSettings');
-  if(btn){ btn.addEventListener('click', ()=>{
-    const ov = document.getElementById('ownerOverlay');
-    if(ov) ov.style.display='flex';
-  });}
-})();
-
-
-// Admin logout
-(function(){
-  const out = document.getElementById('adminLogout');
-  if(out){
-    out.addEventListener('click', ()=>{
-      localStorage.removeItem('kv_admin');
-      alert('Logged out of Admin on this browser.');
-      location.reload();
+  function bindAdminHandlers(){
+    const loginBtn=document.getElementById('ownerLoginBtn');
+    if(loginBtn) loginBtn.addEventListener('click', ()=>{ document.getElementById('ownerOverlay').style.display='flex'; });
+    const ownerSubmit=document.getElementById('ownerSubmit');
+    if(ownerSubmit) ownerSubmit.addEventListener('click', async ()=>{ 
+      const pw=(document.getElementById('ownerPass').value||'').trim(); if(!pw) return setOwnerErr('Enter your admin password.');
+      try{ const ok=await rpc('admin_auth',{pw}); if(ok===true||ok===1){ ADMIN_PW=pw; localStorage.setItem('kv_admin','1'); document.getElementById('ownerOverlay').style.display='none'; showAdminTabIfUnlocked(); refreshCodes(); } else setOwnerErr('Incorrect password.'); }catch(e){ setOwnerErr('Server error: '+e.message); }
     });
+    const passInput=document.getElementById('ownerPass'); if(passInput) passInput.addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('ownerSubmit').click(); });
+    const addBtn=document.getElementById('addCode'); if(addBtn) addBtn.addEventListener('click', adminAdd);
+    const refBtn=document.getElementById('refreshCodes'); if(refBtn) refBtn.addEventListener('click', refreshCodes);
+    const out=document.getElementById('adminLogout'); if(out) out.addEventListener('click', ()=>{ localStorage.removeItem('kv_admin'); alert('Logged out of Admin on this browser.'); location.reload(); });
   }
+
+  async function refreshCodes(){
+    try{ const rows=await rpc('admin_list_codes',{pw:ADMIN_PW}); const tb=document.querySelector('#codesTable tbody'); tb.innerHTML=(rows||[]).map(r=>`<tr><td>${r.code}</td><td>${r.email||''}</td><td>${r.redeemed?'Yes':'No'}</td><td>${r.redeemed_at||''}</td><td>${r.redeemed_by||''}</td><td><button onclick="adminReset('${encodeURIComponent(r.code)}')">Reset</button> <button onclick="adminDelete('${encodeURIComponent(r.code)}')">Delete</button></td></tr>`).join(''); }catch(e){ alert('Refresh failed: '+e.message); }
+  }
+  window.adminDelete = async function(codeEnc){ const code=decodeURIComponent(codeEnc); if(!confirm('Delete this code?')) return; try{ const ok=await rpc('admin_delete_code',{pw:ADMIN_PW,code}); if(ok===true||ok===1) refreshCodes(); else alert('Delete failed.'); }catch(e){ alert('Delete failed: '+e.message); } }
+  window.adminReset = async function(codeEnc){ const code=decodeURIComponent(codeEnc); try{ const ok=await rpc('admin_reset_code',{pw:ADMIN_PW,code}); if(ok===true||ok===1) refreshCodes(); else alert('Reset failed.'); }catch(e){ alert('Reset failed: '+e.message); } }
+  async function adminAdd(){ let code=(document.getElementById('newCode').value||''); code=code.trim().toUpperCase(); const email=(document.getElementById('newEmail').value||'').trim(); if(!code) return alert('Enter a code'); try{ const ok=await rpc('admin_add_code',{pw:ADMIN_PW,code,email}); if(ok===true||ok===1){ document.getElementById('newCode').value=''; document.getElementById('newEmail').value=''; refreshCodes(); } else alert('Add failed.'); }catch(e){ alert('Add failed: '+e.message); } }
+
+  const settBtn=document.getElementById('ownerLoginBtnSettings'); if(settBtn) settBtn.addEventListener('click', ()=>{ document.getElementById('ownerOverlay').style.display='flex'; });
+
+  bindAdminHandlers();
+  showAdminTabIfUnlocked();
 })();
 
-// Service worker
-if('serviceWorker' in navigator){ window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js')); }
+// ===== Init data & renders =====
+(function init(){
+  if(sbUrl) sbUrl.value = SB_CFG.url || SB_URL_DEFAULT;
+  if(sbKey) sbKey.value = SB_CFG.key || "";
+  if(saveSb) saveSb.addEventListener('click', ()=>{ SB_CFG={url: sbUrl.value.trim(), key: sbKey.value.trim()}; localStorage.setItem('kv_supabase_cfg', JSON.stringify(SB_CFG)); alert('Saved. Reloading…'); location.reload(); });
+  renderStudents(); renderSubjects(); renderStandards();
+})();
+
+// ===== Service worker =====
+if('serviceWorker' in navigator){ window.addEventListener('load', ()=>navigator.serviceWorker.register('./sw.js')); }
 </script>
 </body>
 </html>

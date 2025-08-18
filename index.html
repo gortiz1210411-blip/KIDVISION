@@ -170,15 +170,17 @@ select option { line-height:1.2; padding:6px 8px; }
     </div>
     <small class="note" id="studentCount"></small>
 
-    <hr class="split">
+    <hr class="split" id="accessSplit" style="display:none">
 
-    <h3>Access control (Supabase)</h3>
-    <div class="row">
-      <input id="sbUrl" placeholder="Supabase URL" style="flex:1">
-      <input id="sbKey" placeholder="Supabase anon public key" type="password" style="flex:1">
-      <button id="saveSb">Save</button>
+    <div id="accessBlock" style="display:none">
+      <h3>Access control (Supabase)</h3>
+      <div class="row">
+        <input id="sbUrl" placeholder="Supabase URL" style="flex:1">
+        <input id="sbKey" placeholder="Supabase anon public key" type="password" style="flex:1">
+        <button id="saveSb">Save</button>
+      </div>
+      <small class="note">These are baked in; you only need this if you ever change projects.</small>
     </div>
-    <small class="note">These are baked in; you only need this if you ever change projects.</small>
   </section>
 
   <section id="admin" class="section card">
@@ -197,7 +199,15 @@ select option { line-height:1.2; padding:6px 8px; }
       <small class="note">Codes are case-insensitive; spaces trimmed. Stored uppercase.</small>
       <div style="max-height:420px;overflow:auto">
         <table id="codesTable">
-          <thead><tr><th>Code</th><th>Email</th><th>Redeemed</th><th>Redeemed at</th><th>By</th><th>Action</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Status</th>
+              <th>Bound Email</th>
+              <th>Redeemed at</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
           <tbody></tbody>
         </table>
       </div>
@@ -232,14 +242,15 @@ function getSbKey(){ return SB_CFG.key || SB_KEY_DEFAULT; }
   activate('quick');
 })();
 
-// Admin tab hidden unless owner
+// Admin tab hidden unless owner; show Access block only for owner
 (function(){
   const adminTab = document.getElementById('adminTab');
-  if(localStorage.getItem('kv_admin')==='1'){
-    adminTab.style.display = 'inline-block';
-  } else {
-    adminTab.style.display = 'none';
-  }
+  const isAdmin = (localStorage.getItem('kv_admin')==='1');
+  adminTab.style.display = isAdmin ? 'inline-block' : 'none';
+  const accessBlock = document.getElementById('accessBlock');
+  const accessSplit = document.getElementById('accessSplit');
+  if(isAdmin){ accessBlock.style.display = 'block'; accessSplit.style.display = 'block'; }
+  else { accessBlock.style.display = 'none'; accessSplit.style.display = 'none'; }
 })();
 
 // Refs
@@ -311,15 +322,11 @@ function renderTable(){
   tbody.innerHTML = rows.map((r,i)=>`<tr><td>${r.date}</td><td>${r.student}</td><td>${r.subject}</td><td>${r.code}</td><td>${r.standard}</td><td>${r.subskill||''}</td><td>${r.rating}</td><td>${(r.notes||'').replace(/</g,'&lt;')}</td><td><button data-del="${i}">Delete</button></td></tr>`).join('');
 }
 function renderStudentView(){
-  const idx=studentViewSelect.value; const target = (idx===''?null:STUDENTS[idx]?.name); const rows = target? RECORDS.filter(r=>r.student===target) : []; 
+  const idx=studentViewSelect.value; const target = (idx==='',null:STUDENTS[idx]?.name); const rows = target? RECORDS.filter(r=>r.student===target) : []; 
   studentTableBody.innerHTML = rows.map((r,i)=>`<tr><td>${r.date}</td><td>${r.subject}</td><td>${r.code}</td><td>${r.standard}</td><td>${r.subskill||''}</td><td>${r.rating}</td><td>${(r.notes||'').replace(/</g,'&lt;')}</td><td><button data-sdel="${i}">Delete</button></td></tr>`).join('');
 }
 
-// ====== LOGIN FIX (v12.6.1) ======
-// Rule:
-// - If owner password field is non-empty -> treat as owner attempt ONLY.
-// - Else if email+code are both non-empty -> treat as teacher login ONLY.
-// - Do not mix the two; do not prompt again after success.
+// ====== LOGIN (same as 12.6.1 fix) ======
 async function redeemInvite(code, email){
   const url=(SB_CFG.url||"") || "https://pgmxbogkgnpekjoolgte.supabase.co"; 
   const key=(SB_CFG.key||"") || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBnbXhib2drZ25wZWtqb29sZ3RlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU0MDEzNzIsImV4cCI6MjA3MDk3NzM3Mn0.DePl3SELtw06yueZJQPvXYTmUEnz9WC-iCaXreCXUQ8";
@@ -342,36 +349,26 @@ async function unifiedAccess(){
   const rawCode = (document.getElementById('gateCode').value||'');
   const code = rawCode.trim().toUpperCase();
   const pw = (document.getElementById('ownerPass').value||'').trim();
-
-  // Owner path (only if pw present)
   if(pw){
     const ok = await adminAuth(pw);
     if(ok){
       localStorage.setItem('kv_admin','1');
       localStorage.setItem('kv_access_granted','1');
       document.getElementById('adminTab').style.display='inline-block';
+      document.getElementById('accessBlock').style.display='block';
+      document.getElementById('accessSplit').style.display='block';
       document.getElementById('gateOverlay').style.display='none';
       return;
-    } else {
-      setGateErr('Owner password incorrect.');
-      return;
-    }
+    } else { setGateErr('Owner password incorrect.'); return; }
   }
-
-  // Teacher path (requires both email+code)
   if(email && code){
     const ok = await redeemInvite(code, email);
     if(ok){
       localStorage.setItem('kv_access_granted','1');
       document.getElementById('gateOverlay').style.display='none';
       return;
-    } else {
-      setGateErr('Invalid or already redeemed code.');
-      return;
-    }
+    } else { setGateErr('Invalid or already redeemed code.'); return; }
   }
-
-  // Neither path valid
   setGateErr('Teachers: enter email + code. Owner: enter owner password only.');
 }
 
@@ -384,14 +381,34 @@ async function unifiedAccess(){
     const ov=document.getElementById('gateOverlay'); if(ov) ov.style.display='flex';
   }
 })();
-// ====== END LOGIN FIX ======
+// ====== END LOGIN ======
 
-// Admin panel
+// Admin panel with clear STATUS
 (async function(){
   const logout=document.getElementById('adminLogout');
   if(logout) logout.addEventListener('click', ()=>{ localStorage.removeItem('kv_admin'); alert('Admin logged out (this browser).'); location.reload(); });
   async function rpc(name, body){ const url=(SB_CFG.url||"") || "https://pgmxbogkgnpekjoolgte.supabase.co", key=(SB_CFG.key||"") || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBnbXhib2drZ25wZWtqb29sZ3RlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU0MDEzNzIsImV4cCI6MjA3MDk3NzM3Mn0.DePl3SELtw06yueZJQPvXYTmUEnz9WC-iCaXreCXUQ8"; const r=await fetch(`${url}/rest/v1/rpc/${name}`,{method:'POST',headers:{'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json'},body:JSON.stringify(body||{})}); if(!r.ok) throw new Error(name+' failed: '+r.status+' '+await r.text()); const ct=r.headers.get('content-type')||''; return ct.includes('application/json')?await r.json():null; }
-  async function refreshCodes(){ try{ const rows=await rpc('admin_list_codes',{}); const tb=document.querySelector('#codesTable tbody'); tb.innerHTML=(rows||[]).map(r=>`<tr><td>${r.code}</td><td>${r.email||''}</td><td>${r.redeemed?'Yes':'No'}</td><td>${r.redeemed_at||''}</td><td>${r.redeemed_by||''}</td><td><button onclick="adminReset('${encodeURIComponent(r.code)}')">Reset</button> <button onclick="adminDelete('${encodeURIComponent(r.code)}')">Delete</button></td></tr>`).join(''); }catch(e){ alert('Refresh failed: '+e.message); } }
+  async function refreshCodes(){ 
+    try{ 
+      const rows=await rpc('admin_list_codes',{}); 
+      const tb=document.querySelector('#codesTable tbody'); 
+      tb.innerHTML=(rows||[]).map(r=>{
+        const status = r.redeemed ? `Active` : 'Unused';
+        const email = r.redeemed_by || (r.email||'');
+        const when  = r.redeemed_at || '';
+        return `<tr>
+          <td>${r.code}</td>
+          <td>${status}</td>
+          <td>${email}</td>
+          <td>${when}</td>
+          <td>
+            <button onclick="adminReset('${encodeURIComponent(r.code)}')">Reset</button>
+            <button onclick="adminDelete('${encodeURIComponent(r.code)}')">Delete</button>
+          </td>
+        </tr>`;
+      }).join(''); 
+    }catch(e){ alert('Refresh failed: '+e.message); } 
+  }
   window.adminDelete = async function(codeEnc){ const code=decodeURIComponent(codeEnc); if(!confirm('Delete this code?')) return; try{ const ok=await rpc('admin_delete_code',{code}); if(ok===true||ok===1) refreshCodes(); else alert('Delete failed.'); }catch(e){ alert('Delete failed: '+e.message); } }
   window.adminReset = async function(codeEnc){ const code=decodeURIComponent(codeEnc); try{ const ok=await rpc('admin_reset_code',{code}); if(ok===true||ok===1) refreshCodes(); else alert('Reset failed.'); }catch(e){ alert('Reset failed: '+e.message); } }
   const addBtn=document.getElementById('addCode');
@@ -406,9 +423,18 @@ async function unifiedAccess(){
 
 (function init(){
   renderStudents(); renderSubjects(); renderStandards();
-  if(sbUrl) sbUrl.value = "https://pgmxbogkgnpekjoolgte.supabase.co";
-  if(sbKey) sbKey.value = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBnbXhib2drZ25wZWtqb29sZ3RlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU0MDEzNzIsImV4cCI6MjA3MDk3NzM3Mn0.DePl3SELtw06yueZJQPvXYTmUEnz9WC-iCaXreCXUQ8".slice(0,6)+'…';
-  if(saveSb) saveSb.addEventListener('click', ()=>{ SB_CFG={url: sbUrl.value.trim(), key: sbKey.value.trim()}; localStorage.setItem('kv_supabase_cfg', JSON.stringify(SB_CFG)); alert('Saved. Reloading…'); location.reload(); });
+  const isAdmin = (localStorage.getItem('kv_admin')==='1');
+  if(isAdmin){
+    if(sbUrl) sbUrl.value = "https://pgmxbogkgnpekjoolgte.supabase.co";
+    if(sbKey) sbKey.value = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBnbXhib2drZ25wZWtqb29sZ3RlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU0MDEzNzIsImV4cCI6MjA3MDk3NzM3Mn0.DePl3SELtw06yueZJQPvXYTmUEnz9WC-iCaXreCXUQ8".slice(0,6)+'…';
+  }
+  if(saveSb) saveSb.addEventListener('click', ()=>{ 
+    const isAdminNow = (localStorage.getItem('kv_admin')==='1');
+    if(!isAdminNow){ alert('Only owner can change access settings.'); return; }
+    SB_CFG={url: sbUrl.value.trim(), key: sbKey.value.trim()}; 
+    localStorage.setItem('kv_supabase_cfg', JSON.stringify(SB_CFG)); 
+    alert('Saved. Reloading…'); location.reload(); 
+  });
 })();
 
 if('serviceWorker' in navigator){ window.addEventListener('load', ()=>navigator.serviceWorker.register('./sw.js')); }

@@ -1,6 +1,5 @@
 
-const STANDARDS = {"Reading": [{"code": "ELA.5.R.1.1", "desc": "Quote accurately from a text", "subskills": ["Key details", "Textual evidence"]}], "Math": [{"code": "MA.5.NSO.1.1", "desc": "Read/write multi-digit numbers", "subskills": ["Expanded form", "Standard form"]}], "Science": [{"code": "SC.5.N.1.1", "desc": "Scientific inquiry", "subskills": ["Ask questions", "Plan investigations"]}], "meta": {"built": "2025-08-20"}};
-const SUBJECTS = ["Reading","Math","Science"];
+let STANDARDS = {}, SUBJECTS=['Reading','Math','Science'];
 let STUDENTS = JSON.parse(localStorage.getItem('fl_students')||'[]');
 let RECORDS  = JSON.parse(localStorage.getItem('fl_records')||'[]');
 let SETTINGS = JSON.parse(localStorage.getItem('fl_settings')||'{}');
@@ -46,7 +45,6 @@ async function teacherLogin(){
   if(localStorage.getItem('kv_access_granted')==='1' || localStorage.getItem('kv_admin')==='1'){ document.getElementById('gateOverlay').style.display='none'; }
 })();
 
-// Tabs
 (function(){ 
   const tabs = document.querySelectorAll('.tab');
   const sections = document.querySelectorAll('.section');
@@ -55,7 +53,6 @@ async function teacherLogin(){
   activate('quick');
 })();
 
-// Admin visibility + access section (hidden unless owner)
 (function(){
   const adminTab = document.getElementById('adminTab');
   const isAdmin = (localStorage.getItem('kv_admin')==='1');
@@ -66,7 +63,6 @@ async function teacherLogin(){
   else       { accessBlock.style.display='none';  accessSplit.style.display='none';  }
 })();
 
-// Data + UI bindings
 const studentSelect = document.getElementById('studentSelect');
 const subjectSelect = document.getElementById('subjectSelect');
 const standardSelect = document.getElementById('standardSelect');
@@ -177,10 +173,17 @@ document.getElementById('useInitials').onchange = renderStudents;
 document.getElementById('saveSb').onclick = ()=>{ const isAdmin=(localStorage.getItem('kv_admin')==='1'); if(!isAdmin) return alert('Only owner can change access settings.'); const url=document.getElementById('sbUrl').value.trim(); const key=document.getElementById('sbKey').value.trim(); localStorage.setItem('kv_supabase_cfg', JSON.stringify({url,key})); alert('Saved. Reloading…'); location.reload(); };
 
 // Init
-(function init(){
+async function init(){
+  try {
+    const resp = await fetch('standards.json?v=1269');
+    STANDARDS = await resp.json();
+  } catch (e) {
+    STANDARDS = {Reading:[],Math:[],Science:[],meta:{error:String(e)}};
+  }
   document.getElementById('sbUrl').value = "https://pgmxbogkgnpekjoolgte.supabase.co";
-  document.getElementById('sbKey').value = "eyJhbG…";
+  document.getElementById('sbKey').value = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9…";
   renderSubjects(); renderStudents(); renderStandards();
-})();
+}
+init();
 
-if('serviceWorker' in navigator){ window.addEventListener('load', ()=>navigator.serviceWorker.register('./service-worker.js?v=1266a')); }
+if('serviceWorker' in navigator){ window.addEventListener('load', ()=>navigator.serviceWorker.register('./service-worker.js?v=1269')); }

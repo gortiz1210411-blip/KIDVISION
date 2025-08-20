@@ -6,69 +6,23 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>KidVision Student Observations</title>
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="styles.css">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="KidVision">
 <link rel="apple-touch-icon" href="icon-192.png">
-<style>
-:root { --bg:#0a0e1a; --card:#121a32; --accent:#0ab0f5; --accent2:#ff2b75; --muted:#9fb0d0; --line:#1e2a49; }
-* { box-sizing:border-box }
-html,body { margin:0; height:100%; font-family:system-ui,-apple-system,Inter,Segoe UI,Roboto,Arial; color:#e6f0ff; }
-body { background: linear-gradient(135deg, #0a0e1a, #000000); background-attachment: fixed; }
-.app { max-width:980px; margin:0 auto; padding:14px 14px 96px; position:relative; min-height:100vh; }
-header { display:flex; align-items:center; gap:8px; justify-content:space-between; margin-bottom:10px }
-.brand { font-weight:800; letter-spacing:.2px }
-.tabs { display:flex; gap:6px; flex-wrap:wrap }
-.tab { border:1px solid var(--line); background:#0f1832; border-radius:999px; padding:6px 10px; color:#cfe2ff; cursor:pointer; user-select:none }
-.tab.active { background:#243152; color:#fff; border-color:#3a4a74 }
-.card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:12px; box-shadow:0 10px 26px rgba(0,0,0,.25) }
-.row { display:flex; gap:8px; align-items:center; flex-wrap:wrap }
-input,select,textarea,button { background:#0d152b; border:1px solid var(--line); color:#e6f0ff; border-radius:10px; padding:10px 12px; font-size:16px }
-button { background: var(--accent); }
-button:hover { background: var(--accent2); }
-textarea { width:100%; min-height:80px }
-h3 { margin:0 0 8px 0 }
-small.note, small.muted { color:#9fb0d0 }
-table { width:100%; border-collapse:collapse }
-th,td { border-bottom:1px solid var(--line); padding:8px 6px; text-align:left; vertical-align:top }
-th { position:sticky; top:0; background:#0f1832; z-index:1 }
-.right { margin-left:auto }
-.badge { border:1px solid var(--line); padding:2px 8px; border-radius:999px; color:#bcd1ff; font-size:12px }
-.section { display:none }
-.section.active { display:block }
-select, .dropdown { max-width:100%; white-space:normal; overflow-wrap:break-word; }
-select { max-height:220px; overflow-y:auto; }
-select option { line-height:1.2; padding:6px 8px; }
-
-#gateOverlay{position:fixed;inset:0;background:rgba(5,8,18,.96);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;z-index:9999}
-#gateCard{background:#151b2f;border:1px solid #26335b;border-radius:16px;padding:16px;max-width:480px;width:92%;box-shadow:0 15px 40px rgba(0,0,0,.45);}
-#gateCard h2{margin:0 0 8px 0}
-#gateCard p{color:#9fb0d0;margin:0 0 12px 0}
-#gateCard input, #gateCard select{width:100%;margin:6px 0 10px 0;background:#0e1630;border:1px solid #26335b;color:#e6f0ff;border-radius:10px;padding:10px 12px}
-#gateCard button{width:100%;padding:10px 14px;border-radius:12px;background:#0ab0f5;border:1px solid #3a9dd4;color:#fff;font-weight:600}
-#gateCard small{display:block;color:#9fb0d0;margin-top:8px;text-align:center}
-#gateErr{color:#ff6f91;min-height:18px;margin-bottom:6px}
-
-.footer-logo { position:fixed; left:0; right:0; bottom:8px; display:flex; justify-content:center; pointer-events:none; }
-.footer-logo img { width:140px; opacity:.85; filter: drop-shadow(0 6px 18px rgba(0,0,0,.35)); }
-</style>
 </head>
 <body>
-
 <div id="gateOverlay">
   <div id="gateCard">
-    <h2>Access KidVision</h2>
-    <p><strong>Teachers:</strong> enter email + invite code. <strong>Owner:</strong> enter owner password only.</p>
+    <h2>Teacher Access</h2>
+    <p>Enter your <b>email</b> and <b>invite code</b> to continue.</p>
     <div id="gateErr"></div>
-    <div id="userFields">
-      <input id="gateEmail" placeholder="Email (teachers)">
-      <input id="gateCode" placeholder="Invite code (teachers)">
-    </div>
-    <div id="ownerFields" style="margin-top:6px">
-      <input id="ownerPass" type="password" placeholder="Owner password (leave blank if not owner)">
-    </div>
+    <input id="gateEmail" placeholder="Email">
+    <input id="gateCode" placeholder="Invite code">
     <button id="gateSubmit">Continue</button>
-    <small>Problems? Contact the owner.</small>
+    <small id="gateDbg"></small>
+    <a id="ownerLink" href="owner_login.html">Owner login</a>
   </div>
 </div>
 
@@ -98,9 +52,7 @@ select option { line-height:1.2; padding:6px 8px; }
       <select id="standardSelect" style="flex:1"></select>
     </div>
     <div class="row" style="margin-top:8px">
-      <select id="subskillSelect" style="flex:1" disabled>
-        <option value="">Select subskill…</option>
-      </select>
+      <select id="subskillSelect" style="flex:1" disabled><option value="">Select subskill…</option></select>
       <div id="ratingGroup" class="row">
         <button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button><button data-v="5">5</button>
       </div>
@@ -119,14 +71,12 @@ select option { line-height:1.2; padding:6px 8px; }
       <input id="filterStudent" placeholder="Filter by student…" style="flex:1">
       <input id="filterCode" placeholder="Filter by code/text/subskill…" style="flex:1">
       <select id="filterSubject"></select>
-      <select id="filterRating">
-        <option value="">All</option><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option>
-      </select>
+      <select id="filterRating"><option value="">All</option><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select>
       <button id="exportBtn" class="right">Export CSV</button>
     </div>
     <div style="max-height:420px;overflow:auto">
       <table id="dataTable">
-        <thead><tr><th>Date</th><th>Student</th><th>Subject</th><th>Code</th><th>Standard</th><th>Subskill</th><th>Rating</th><th>Notes</th><th>Action</th></tr></thead>
+        <thead><tr><th>Date</th><th>Student</</th><th>Subject</th><th>Code</th><th>Standard</th><th>Subskill</th><th>Rating</th><th>Notes</th><th>Action</th></tr></thead>
         <tbody></tbody>
       </table>
     </div>
@@ -148,15 +98,8 @@ select option { line-height:1.2; padding:6px 8px; }
 
   <section id="settings" class="section card">
     <h3>Settings</h3>
-
-    <div class="toggle">
-      <input type="checkbox" id="hideNames">
-      <label for="hideNames">Hide student names in app</label>
-    </div>
-    <div class="toggle" style="margin-top:8px">
-      <input type="checkbox" id="useInitials">
-      <label for="useInitials">Show initials instead of full name when hidden</label>
-    </div>
+    <div class="toggle"><input type="checkbox" id="hideNames"><label for="hideNames"> Hide student names in app</label></div>
+    <div class="toggle" style="margin-top:8px"><input type="checkbox" id="useInitials"><label for="useInitials"> Show initials when names are hidden</label></div>
 
     <div class="row" style="margin-top:12px">
       <input id="newStudentName" placeholder="Add student name" style="flex:1">
@@ -170,15 +113,16 @@ select option { line-height:1.2; padding:6px 8px; }
     </div>
     <small class="note" id="studentCount"></small>
 
-    <hr class="split">
-
-    <h3>Access control (Supabase)</h3>
-    <div class="row">
-      <input id="sbUrl" placeholder="Supabase URL" style="flex:1">
-      <input id="sbKey" placeholder="Supabase anon public key" type="password" style="flex:1">
-      <button id="saveSb">Save</button>
+    <hr class="split" id="accessSplit" style="display:none">
+    <div id="accessBlock" style="display:none">
+      <h3>Access control (Supabase)</h3>
+      <div class="row">
+        <input id="sbUrl" placeholder="Supabase URL" style="flex:1">
+        <input id="sbKey" placeholder="Supabase anon public key" type="password" style="flex:1">
+        <button id="saveSb">Save</button>
+      </div>
+      <small class="note">Defaults are baked in; only change if you switch projects.</small>
     </div>
-    <small class="note">These are baked in; you only need this if you ever change projects.</small>
   </section>
 
   <section id="admin" class="section card">
@@ -194,10 +138,10 @@ select option { line-height:1.2; padding:6px 8px; }
         <input id="newEmail" placeholder="Email (optional)" style="flex:1">
         <button id="addCode">Add</button>
       </div>
-      <small class="note">Codes are case-insensitive; spaces trimmed. Stored uppercase.</small>
+      <small class="note">Codes are case-insensitive; spaces + hyphens ignored.</small>
       <div style="max-height:420px;overflow:auto">
         <table id="codesTable">
-          <thead><tr><th>Code</th><th>Email</th><th>Redeemed</th><th>Redeemed at</th><th>By</th><th>Action</th></tr></thead>
+          <thead><tr><th>Code</th><th>Status</th><th>Bound Email</th><th>Redeemed at</th><th>Actions</th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
@@ -207,211 +151,6 @@ select option { line-height:1.2; padding:6px 8px; }
 
 <div class="footer-logo"><img src="kidvision_logo.png" alt="KidVision logo"></div>
 
-<script>
-const STANDARDS = {"Reading": [{"code": "ELA.5.R.1.1", "desc": "Analyze how setting, events, conflict, and characterization contribute to the plot in a literary text.", "subskills": ["Read science fiction with illustrations (5)", "Use actions and dialogue to understand characters (5-C.1)", "Compare and contrast characters (5-C.2)", "Identify story elements (5-I.2)", "Read fantasy with illustrations (5-M.1)", "Read realistic fiction with illustrations (5-M.2)", "Read historical fiction with illustrations (5-M.3)", "Read realistic fiction (5-N.1)", "Read historical fiction (5-N.2)", "Read poetry (5-N.3)", "Read drama (5-N.4)", "Summarize a story (5-S.1)", "Identify supporting details in literary texts (5-T.4)", "Show character emotions and traits (5-U.1)"]}, {"code": "ELA.5.R.1.2", "desc": "Explain the development of stated or implied theme(s) throughout a literary text.", "subskills": ["Determine the themes of short stories (5-B.1)"]}, {"code": "ELA.5.R.1.3", "desc": "Describe how an author develops a character's perspective in a literary text.", "subskills": ["Use actions and dialogue to understand characters (5-C.1)", "Identify the narrative point of view (5-I.1)"]}, {"code": "ELA.5.R.1.4", "desc": "Explain how figurative language and other poetic elements work together in a poem.", "subskills": ["Identify similes and metaphors (5-H.1)", "Similes and metaphors with pictures (5-H.2)", "Determine the meanings of similes and metaphors (5-H.3)", "Interpret the meaning of an allusion from its source (5-H.4)", "Analyze the effects of figures of speech on meaning and tone (5-H.5)", "Label the rhyme scheme (5-L.1)", "Identify elements of poetry (5-L.2)", "Read poetry (5-N.3)", "Classify figures of speech (5)", "ELA.5.R.2 Reading Informational Text"]}, {"code": "ELA.5.R.2.1", "desc": "Explain how text structures and/or features contribute to the overall meaning of texts.", "subskills": ["Determine the order of events in informational texts (5-F.1)", "Compare and contrast in informational texts (5-F.2)", "Match causes and effects in informational texts (5-F.3)", "Match problems with their solutions (5-F.4)", "Identify text structures (5-F.5)", "Read graphic organizers (5-J.2)", "Select and use text features (5-K.1)"]}, {"code": "ELA.5.R.2.2", "desc": "Explain how relevant details support the central idea(s), implied or explicit.", "subskills": ["Use key details to determine the central idea (5)", "Read about animals (5-O.1)", "Read about art, music, and traditions (5-O.2)", "Read about famous places (5-O.3)", "Read about sports and hobbies (5-O.4)", "Read about famous people (5-P.1)", "Read about business and technology (5-P.2)", "Read about science and nature (5-P.3)", "Read about history (5-P.4)", "Identify supporting details in informational texts (5-T.5)", "Determine the central idea of a passage (5)", "Combine central ideas from two texts (5)"]}, {"code": "ELA.5.R.2.3", "desc": "Analyze an author's purpose and/or perspective in an informational text.", "subskills": ["Identify the purpose of a text (5-D.1)", "Compare information from two texts (5-E.2)"]}, {"code": "ELA.5.R.2.4", "desc": "Track the development of an argument, identifying the specific claim(s), evidence, and reasoning.", "subskills": ["Identify an author's statement of opinion (5-T.2)", "Choose reasons to support an opinion (5-T.3)", "Identify supporting details in informational texts (5-T.5)", "Identify counterclaims (5)", "Trace an argument (5)", "Classify logical fallacies (5)", "ELA.5.R.3 Reading Across Genres"]}, {"code": "ELA.5.R.3.1", "desc": "Analyze how figurative language contributes to meaning in text(s).", "subskills": ["Determine the meanings of similes and metaphors (5-H.3)", "Interpret the meaning of an allusion from its source (5-H.4)", "Analyze the effects of figures of speech on meaning and tone (5-H.5)", "Determine the meaning of idioms from context: set 1 (5-EE.1)", "Identify the meaning of idioms and adages: set 1 (5-EE.2)", "Determine the meaning of idioms from context: set 2 (5-EE.3)", "Identify the meaning of idioms and adages: set 2 (5-EE.4)", "Classify figures of speech (5)", "Use personification (5)"]}, {"code": "ELA.5.R.3.2", "desc": "Summarize a text to enhance comprehension.", "subskills": ["ELA.5.R.3.2.a Include plot and theme for a literary text.", "Read science fiction with illustrations (5)", "Determine the themes of short stories (5-B.1)", "Identify story elements (5-I.2)", "Read fantasy with illustrations (5-M.1)", "Read realistic fiction with illustrations (5-M.2)", "Read historical fiction with illustrations (5-M.3)", "Read realistic fiction (5-N.1)", "Read historical fiction (5-N.2)", "Read poetry (5-N.3)", "Read drama (5-N.4)", "Summarize a story (5-S.1)", "ELA.5.R.3.2.b Include the central idea and relevant details for an informational text.", "Use key details to determine the central idea (5)", "Read about animals (5-O.1)", "Read about art, music, and traditions (5-O.2)", "Read about famous places (5-O.3)", "Read about sports and hobbies (5-O.4)", "Read about famous people (5-P.1)", "Read about business and technology (5-P.2)", "Read about science and nature (5-P.3)", "Read about history (5-P.4)", "Identify supporting details in informational texts (5-T.5)", "Determine the central idea of a passage (5)", "Trace an argument (5)"]}, {"code": "ELA.5.R.3.3", "desc": "Compare and contrast primary and secondary sources related to the same topic.", "subskills": ["Compare and contrast points of view (5-E.1)", "Compare information from two texts (5-E.2)", "Compare mythological illustrations (5-J.1)"]}], "Math": [{"code": "MA.5.NSO.1.1", "desc": "Express how the value of a digit in a multi-digit number with decimals to the thousandths changes if the digit moves one or more places to the left or right.", "subskills": ["Place values in decimal numbers (5-W.4)", "Relationship between decimal place values (5-W.5)"]}, {"code": "MA.5.NSO.1.2", "desc": "Read and write multi-digit numbers with decimals to the thousandths using standard form, word form and expanded form.", "subskills": ["Understanding decimals expressed in words (5-W.3)", "Convert decimals between standard and expanded form (5-W.6)", "Convert decimals between standard and expanded form using fractions (5-W.7)"]}, {"code": "MA.5.NSO.1.3", "desc": "Compose and decompose multi-digit numbers with decimals to the thousandths in multiple ways using the values of the digits in each place. Demonstrate the compositions or decompositions using objects, drawings and expressions or equations.", "subskills": ["What decimal number is illustrated? (5-W.1)", "Place values in decimal numbers (5-W.4)", "Compose and decompose decimals in multiple ways (5-W.8)"]}, {"code": "MA.5.NSO.1.4", "desc": "Plot, order and compare multi-digit numbers with decimals up to the thousandths.", "subskills": ["Decimal number lines (5-W.10)", "Compare decimals using grids (5-X.2)", "Compare decimals on number lines (5-X.3)", "Compare decimal numbers (5-X.4)", "Put decimal numbers in order (5-X.5)"]}, {"code": "MA.5.NSO.1.5", "desc": "Round multi-digit numbers with decimals to the thousandths to the nearest hundredth, tenth or whole number.", "subskills": ["Round decimals (5-W.9)", "Compare, order, and round decimals: word problems (5-X.6)", "Estimate sums and differences of decimals using rounding (5-AA.13)", "MA.5.NSO.2 Add, subtract, multiply and divide multi-digit numbers."]}, {"code": "MA.5.NSO.2.1", "desc": "Multiply multi-digit whole numbers including using a standard algorithm with procedural fluency.", "subskills": ["Multiply by 1-digit numbers (5-D.7)", "Multiply by 1-digit numbers: word problems (5-D.8)", "Multiply by 2-digit numbers: complete the missing steps (5-D.9)", "Multiply 2-digit numbers by 2-digit numbers (5-D.10)", "Multiply 2-digit numbers by 3-digit numbers (5-D.11)", "Multiply 2-digit numbers by larger numbers (5-D.12)", "Multiply by 2-digit numbers: word problems (5-D.13)", "Multiply by 3-digit numbers (5-D.14)"]}, {"code": "MA.5.NSO.2.2", "desc": "Divide multi-digit whole numbers, up to five digits by two digits, including using a standard algorithm with procedural fluency. Represent remainders as fractions.", "subskills": ["Divide by 2-digit numbers: estimate and adjust (5-E.9)", "Divide by 2-digit numbers using models (5-E.10)", "Divide by 2-digit numbers using partial quotients (5-E.11)", "Divide 2-digit and 3-digit numbers by 2-digit numbers (5-E.12)", "Divide 4-digit numbers by 2-digit numbers (5-E.14)", "Choose numbers with a particular quotient (5-E.19)", "Divide 3-digit numbers by 2-digit numbers: write remainders as fractions (5)", "Divide 5-digit numbers by 2-digit numbers (5)", "Divide 4-digit and 5-digit numbers by 2-digit numbers: write remainders as fractions (5)", "Divide by 2-digit numbers: word problems (5)"]}, {"code": "MA.5.NSO.2.3", "desc": "Add and subtract multi-digit numbers with decimals to the thousandths, including using a standard algorithm with procedural fluency.", "subskills": ["Use properties to add three decimals (5-AA.3)", "Add and subtract decimal numbers (5)", "Use compensation to add and subtract decimals (5-AA.7)", "Add and subtract decimal numbers: word problems (5)", "Choose decimals with a particular sum or difference (5)", "Add and subtract money amounts (5-HH.1)", "Add and subtract money: word problems (5-HH.2)", "Add decimal numbers: up to thousandths (5)", "Subtract decimal numbers: up to thousandths (5)", "Complete the decimal addition or subtraction sentence (5)"]}, {"code": "MA.5.NSO.2.4", "desc": "Explore the multiplication and division of multi-digit numbers with decimals to the hundredths using estimation, rounding and place value.", "subskills": ["Multiply a decimal by a power of ten (5-BB.1)", "Multiply by a power of ten with decimals: find the missing number (5-BB.4)", "Multiply a decimal by a one-digit whole number: tenths or hundredths (5-CC.2)", "Multiply a decimal by a one-digit whole number using blocks (5-CC.3)", "Multiply a decimal by a one-digit whole number using the distributive property (5-CC.4)", "Multiply a decimal by a one-digit whole number (5-CC.5)", "Multiply a decimal by a two-digit whole number using area models (5-CC.6)", "Estimate products of decimals (5-DD.1)", "Multiply decimals less than one using grids (5-DD.2)", "Multiply decimals using grids (5-DD.3)", "Multiply two decimals: where does the decimal point go? (5-DD.4)", "Multiply decimals using area models (5-DD.5)", "Multiply two decimals: products up to hundredths (5-DD.6)", "Divide by powers of ten (5-EE.1)", "Decimal division patterns over increasing place values (5-EE.2)", "Divide by a power of ten with decimals: find the missing number (5-EE.5)", "Estimate decimal quotients (5-FF.1)", "Divide decimals using blocks: complete the equation (5-FF.2)", "Divide decimals using area models: complete the equation (5-FF.3)", "Divide decimals by whole numbers using place value (5-FF.4)", "Divide decimals by whole numbers without adding zeros (5-FF.5)", "Division with decimal quotients (5-FF.6)", "Divide by decimals using place value (5-FF.9)"]}, {"code": "MA.5.NSO.2.5", "desc": "Multiply and divide a multi-digit number with decimals to the tenths by one-tenth and one-hundredth with procedural reliability.", "subskills": ["Multiply by 0.1 or 0.01 (5-BB.3)", "Divide by 0.1 or 0.01 (5)", "Multiply and divide decimals by 0.1 and 0.01 (5)", "FR Fractions", "MA.5.FR.1 Interpret a fraction as an answer to a division problem."]}, {"code": "MA.5.FR.1.1", "desc": "Given a mathematical or real-world problem, represent the division of two whole numbers as a fraction.", "subskills": ["Understand fractions as division: word problems (5-T.2)", "Fractions of a whole: word problems (5)", "MA.5.FR.2 Perform operations with fractions."]}, {"code": "MA.5.FR.2.1", "desc": "Add and subtract fractions with unlike denominators, including mixed numbers and fractions greater than 1, with procedural reliability.", "subskills": ["Estimate sums and differences of fractions using benchmarks (5-L.1)", "Add fractions with unlike denominators using models (5-L.2)", "Add fractions with unlike denominators (5-L.3)", "Subtract fractions with unlike denominators using models (5-L.4)", "Subtract fractions with unlike denominators (5-L.5)", "Add 3 or more fractions with unlike denominators (5-L.8)", "Complete addition and subtraction sentences with fractions (5-L.10)", "Add mixed numbers with unlike denominators (5-M.3)", "Subtract mixed numbers with unlike denominators (5-M.4)", "Complete addition and subtraction sentences with mixed numbers (5-M.9)"]}, {"code": "MA.5.FR.2.2", "desc": "Extend previous understanding of multiplication to multiply a fraction by a fraction, including mixed numbers and fractions greater than 1, with procedural reliability.", "subskills": ["Multiply two unit fractions using models (5-N.7)", "Multiply two fractions using models (5-N.8)", "Multiply fractions greater than one using models (5-N.9)", "Multiply two fractions (5-P.1)", "Complete the fraction multiplication sentence I (5-P.4)", "Complete the fraction multiplication sentence II (5-P.5)", "Multiply a mixed number by a fraction (5-R.3)", "Multiply two mixed numbers (5-R.4)"]}, {"code": "MA.5.FR.2.3", "desc": "When multiplying a given number by a fraction less than 1 or a fraction greater than 1, predict and explain the relative size of the product to the given number without calculating.", "subskills": ["Estimate products of mixed numbers (5-R.1)", "Scaling whole numbers by fractions: justify your answer (5-S.1)", "Scaling whole numbers by fractions (5-S.2)", "Scaling fractions by fractions (5-S.3)", "Scaling mixed numbers by fractions (5-S.4)"]}, {"code": "MA.5.FR.2.4", "desc": "Extend previous understanding of division to explore the division of a unit fraction by a whole number and a whole number by a unit fraction.", "subskills": ["Divide unit fractions by whole numbers using models (5-T.3)", "Divide whole numbers by unit fractions using models (5-T.5)", "Divide unit fractions and whole numbers using area models (5-T.7)", "Divide unit fractions and whole numbers using number lines (5-T.8)", "Divide unit fractions by whole numbers (5-U.1)", "Divide whole numbers by unit fractions (5-U.2)", "Divide unit fractions and whole numbers (5-U.3)", "AR Algebraic Reasoning", "MA.5.AR.1 Solve problems involving the four operations with whole numbers and fractions."]}, {"code": "MA.5.AR.1.1", "desc": "Solve multi-step real-world problems involving any combination of the four operations with whole numbers, including problems in which remainders must be interpreted within the context.", "subskills": ["Represent multi-step problems using equations (5-I.3)", "Multi-step word problems (5-I.4)", "Multi-step word problems involving remainders (5-I.5)", "Multi-step word problems: identify reasonable answers (5-I.6)", "Multi-step word problems: multiplicative comparison (5-I.7)"]}, {"code": "MA.5.AR.1.2", "desc": "Solve real-world problems involving the addition, subtraction or multiplication of fractions, including mixed numbers and fractions greater than 1.", "subskills": ["Add and subtract fractions with unlike denominators: word problems (5-L.7)", "Add 3 or more fractions: word problems (5-L.9)", "Add and subtract mixed numbers: word problems (5-M.6)", "Add and subtract fractions and mixed numbers in recipes (5-M.7)", "Add and subtract fractions and mixed numbers: multi-step word problems (5-M.8)", "Multiply fractions by whole numbers: word problems (5-O.3)", "Multiply two fractions: word problems (5-P.2)", "Multiplication with mixed numbers: word problems (5-R.7)", "Multiply fractions and mixed numbers in recipes (5-R.8)", "Multiply fractions and mixed numbers: multi-step word problems (5-R.9)"]}, {"code": "MA.5.AR.1.3", "desc": "Solve real-world problems involving division of a unit fraction by a whole number and a whole number by a unit fraction.", "subskills": ["Divide unit fractions and whole numbers: word problems (5-U.4)", "Multi-step word problems with fractions and mixed numbers (5-V.3)", "MA.5.AR.2 Demonstrate an understanding of equality, the order of operations and equivalent numerical expressions."]}, {"code": "MA.5.AR.2.1", "desc": "Translate written real-world and mathematical descriptions into numerical expressions and numerical expressions into written mathematical descriptions.", "subskills": ["Write numerical expressions: one operation (5-H.1)", "Write numerical expressions: two operations (5-H.2)", "Comparison statements with numerical expressions (5-H.10)", "Write numerical expressions for word problems (5-I.1)", "Use numerical expressions to solve multi-step word problems (5-I.2)"]}, {"code": "MA.5.AR.2.2", "desc": "Evaluate multi-step numerical expressions using order of operations.", "subskills": ["Evaluate numerical expressions (5-H.3)", "Evaluate numerical expressions with parentheses (5-H.4)", "Evaluate numerical expressions with parentheses in different places (5-H.7)", "Evaluate numerical expressions with fractions (5-H.8)"]}, {"code": "MA.5.AR.2.3", "desc": "Determine and explain whether an equation involving any of the four operations is true or false.", "subskills": ["Identify mistakes involving the order of operations (5-H.6)", "Equations with mixed operations: true or false (5-GG.4)", "Mixed operation equations with whole numbers: true or false (5)"]}, {"code": "MA.5.AR.2.4", "desc": "Given a mathematical or real-world context, write an equation involving any of the four operations to determine the unknown whole number with the unknown in any position.", "subskills": ["Use equations to solve multi-step word problems (5)", "Represent multi-step problems using equations (5-I.3)", "Write variable equations: word problems (5-MM.4)", "MA.5.AR.3 Analyze patterns and relationships between inputs and outputs."]}, {"code": "MA.5.AR.3.1", "desc": "Given a numerical pattern, identify and write a rule that can describe the pattern as an expression.", "subskills": ["Compare patterns (5-KK.2)", "Input/output tables: find the rule (5)"]}, {"code": "MA.5.AR.3.2", "desc": "Given a rule for a numerical pattern, use a two-column table to record the inputs and outputs.", "subskills": ["Complete a table for a two-variable relationship (5-MM.6)", "Use an expression to complete a table (5)", "Use a rule to complete an input/output table (5)", "Use an expression to complete a table and a graph (5)", "M Measurement", "MA.5.M.1 Convert measurement units to solve multi-step problems."]}, {"code": "MA.5.M.1.1", "desc": "Solve multi-step real-world problems that involve converting measurement units to equivalent measurements within a single system of measurement.", "subskills": ["Compare and convert customary units of length (5-II.1)", "Compare and convert customary units of weight (5-II.2)", "Compare and convert customary units of volume (5-II.3)", "Compare and convert customary units (5-II.4)", "Conversion tables - customary units (5-II.5)", "Compare customary units by multiplying (5-II.6)", "Convert customary units involving fractions (5-II.7)", "Convert mixed customary units (5-II.8)", "Add and subtract mixed customary units (5-II.9)", "Multi-step problems with customary unit conversions (5-II.10)", "Compare and convert metric units of length (5-JJ.1)", "Compare and convert metric units of mass (5-JJ.2)", "Compare and convert metric units of volume (5-JJ.3)", "Compare and convert metric units (5-JJ.4)", "Conversion tables - metric units (5-JJ.5)", "Convert metric mixed units (5-JJ.6)", "Add and subtract metric mixed units (5-JJ.7)", "Multi-step problems with metric unit conversions (5-JJ.8)", "Multi-step problems with customary or metric unit conversions (5-JJ.9)", "Convert metric units involving decimals (5)", "MA.5.M.2 Solve problems involving money."]}, {"code": "MA.5.M.2.1", "desc": "Solve multi-step real-world problems involving money using decimal notation.", "subskills": ["Add and subtract money: word problems (5-HH.2)", "Add and subtract money: multi-step word problems (5-HH.3)", "Price lists (5-HH.9)", "Unit prices (5-HH.10)", "GR Geometric Reasoning", "MA.5.GR.1 Classify two-dimensional figures and three-dimensional figures based on defining attributes."]}, {"code": "MA.5.GR.1.1", "desc": "Classify triangles or quadrilaterals into different categories based on shared defining attributes. Explain why a triangle or quadrilateral would or would not belong to a category.", "subskills": ["Acute, obtuse, and right triangles (5-PP.1)", "Scalene, isosceles, and equilateral triangles (5-PP.2)", "Classify triangles (5-PP.3)", "Parallel sides in quadrilaterals (5-QQ.1)", "Identify parallelograms (5-QQ.2)", "Identify rectangles (5-QQ.4)", "Identify rhombuses (5-QQ.5)", "Identify trapezoids (5)", "Classify quadrilaterals (5)", "Identify the relationships between quadrilaterals (5)", "Describe relationships among quadrilaterals (5)"]}, {"code": "MA.5.GR.1.2", "desc": "Identify and classify three-dimensional figures into categories based on their defining attributes. Figures are limited to right pyramids, right prisms, right circular cylinders, right circular cones and spheres.", "subskills": ["Identify three-dimensional figures (5)", "Count vertices, edges, and faces (5)", "Attributes of three-dimensional figures (5)", "Sort three-dimensional figures (5)", "MA.5.GR.2 Find the perimeter and area of rectangles with fractional or decimal side lengths."]}, {"code": "MA.5.GR.2.1", "desc": "Find the perimeter and area of a rectangle with fractional or decimal side lengths using visual models and formulas.", "subskills": ["Understand fraction multiplication and area (5-P.6)", "Multiply fractions to find area (5-P.7)", "Area of squares and rectangles (5-TT.1)", "Area of rectangles with fractions (5-TT.2)", "Area of rectangles with fractions and mixed numbers (5-TT.3)", "Area and perimeter of rectangles with decimals (5-TT.)", "Perimeter of rectangles with fractional side lengths (5)", "MA.5.GR.3 Solve problems involving the volume of right rectangular prisms."]}, {"code": "MA.5.GR.3.1", "desc": "Explore volume as an attribute of three-dimensional figures by packing them with unit cubes without gaps. Find the volume of a right rectangular prism with whole-number side lengths by counting unit cubes.", "subskills": ["Volume of rectangular prisms made of unit cubes (5-UU.3)"]}, {"code": "MA.5.GR.3.2", "desc": "Find the volume of a right rectangular prism with whole-number side lengths using a visual model and a formula.", "subskills": ["Volume of rectangular prisms made of unit cubes: expressions (5-UU.2)", "Volume of cubes and rectangular prisms (5-UU.5)"]}, {"code": "MA.5.GR.3.3", "desc": "Solve real-world problems involving the volume of right rectangular prisms, including problems with an unknown edge length, with whole-number edge lengths using a visual model or a formula. Write an equation with a variable for the unknown to represent the problem.", "subskills": ["Volume of cubes and rectangular prisms: word problems (5-UU.6)", "Volume of cubes and rectangular prisms: multi-step word problems (5-UU.8)", "MA.5.GR.4 Plot points and represent problems on the coordinate plane."]}, {"code": "MA.5.GR.4.1", "desc": "Identify the origin and axes in the coordinate system. Plot and label ordered pairs in the first quadrant of the coordinate plane.", "subskills": ["Describe the coordinate plane (5-LL.1)", "Objects on a coordinate plane (5-LL.2)", "Graph points on a coordinate plane (5-LL.3)"]}, {"code": "MA.5.GR.4.2", "desc": "Represent mathematical and real-world problems by plotting points in the first quadrant of the coordinate plane and interpret coordinate values of points in the context of the situation.", "subskills": ["Graph points from a table (5-LL.5)", "Coordinate planes as maps (5-LL.8)", "Follow directions on a coordinate plane (5-LL.9)", "DP Data Analysis and Probability", "MA.5.DP.1 Collect, represent and interpret data and find the mean, mode, median or range of a data set."]}, {"code": "MA.5.DP.1.1", "desc": "Collect and represent numerical data, including fractional and decimal values, using tables, line graphs or line plots.", "subskills": ["Create and interpret frequency tables with numerical data (5)", "Create line plots with fractions (5-NN.2)", "Create and interpret line plots with fractions (5-NN.3)", "Create line graphs (5-NN.5)"]}, {"code": "MA.5.DP.1.2", "desc": "Interpret numerical data, with whole-number values, represented with tables or line plots by determining the mean, mode, median or range.", "subskills": ["Find the mean, median, mode, or range from a list of whole numbers (5)", "Find the mean, median, mode, or range from a table or line plot (5)", "Find the mean from a table (5)", "Find the mean, median, mode, or range from a table (5)", "Find the mean, median, mode, or range from a line plot (5)"]}], "Science": [{"code": "SC.5.E.5.1", "desc": "Recognize that a galaxy consists of gas, dust, and many stars, including any objects orbiting the stars. Identify our home galaxy as the Milky Way.", "subskills": []}, {"code": "SC.5.E.5.2", "desc": "Recognize the major common characteristics of all planets and compare/contrast the properties of inner and outer planets.", "subskills": ["Analyze data to compare properties of planets (6-HH.7)"]}, {"code": "SC.5.E.5.3", "desc": "Distinguish among the following objects of the Solar System — Sun, planets, moons, asteroids, comets — and identify Earth's position in it.", "subskills": ["Identify the planets in the solar system (5-Y.10)", "Analyze models of the Earth-Sun-Moon system (6-HH.1)", "Analyze data to compare properties of planets (6-HH.7)", "SC.5.E.7 Earth Systems and Patterns"]}, {"code": "SC.5.E.7.1", "desc": "Create a model to explain the parts of the water cycle. Water can be a gas, a liquid, or a solid and can go back and forth from one state to another.", "subskills": ["Label parts of water cycle diagrams (5-W.2)", "Select parts of water cycle diagrams (5-W.3)"]}, {"code": "SC.5.E.7.2", "desc": "Recognize that the ocean is an integral part of the water cycle and is connected to all of Earth's water reservoirs via evaporation and precipitation processes.", "subskills": ["Describe and graph water on Earth (5-W.1)", "Label parts of water cycle diagrams (5-W.2)", "Select parts of water cycle diagrams (5-W.3)"]}, {"code": "SC.5.E.7.3", "desc": "Recognize how air temperature, barometric pressure, humidity, wind speed and direction, and precipitation determine the weather in a particular place and time.", "subskills": ["What's the difference between weather and climate? (5-V.2)", "Weather and climate around the world (5-V.3)", "Weather or climate? Cite text (5-V.4)"]}, {"code": "SC.5.E.7.4", "desc": "Distinguish among the various forms of precipitation (rain, snow, sleet, and hail), making connections to the weather in a particular place and time.", "subskills": []}, {"code": "SC.5.E.7.5", "desc": "Recognize that some of the weather-related differences, such as temperature and humidity, are found among different environments, such as swamps, deserts, and mountains.", "subskills": ["Use data to describe climates (5-V.6)"]}, {"code": "SC.5.E.7.6", "desc": "Describe characteristics (temperature and precipitation) of different climate zones as they relate to latitude, elevation, and proximity to bodies of water.", "subskills": ["Use data to describe climates (5-V.6)", "Factors affecting climate: latitude (5)", "Factors affecting climate: altitude (5)", "Factors affecting climate: distance from the ocean (5)"]}, {"code": "SC.5.E.7.7", "desc": "Design a family preparedness plan for natural disasters and identify the reasons for having such a plan.", "subskills": ["Identify the best design solution to prevent hurricane damage (5-Z.2)", "SC.5.L Life Science", "SC.5.L.14 Organization and Development of Living Organisms"]}, {"code": "SC.5.L.14.1", "desc": "Identify the organs in the human body and describe their functions, including the skin, brain, heart, lungs, stomach, liver, intestines, pancreas, muscles and skeleton, reproductive organs, kidneys, bladder, and sensory organs.", "subskills": ["Human organs and their functions (5-M.3)", "Body systems: circulation and respiration (5-M.4)", "Body systems: digestion (5-M.5)", "Body systems: removing waste (5-M.6)", "Body systems: perception and motion (5-M.7)"]}, {"code": "SC.5.L.14.2", "desc": "Compare and contrast the function of organs and other physical structures of plants and animals, including humans, for example: some animals have skeletons for support — some with internal skeletons others with exoskeletons — while some plants have stems for support.", "subskills": ["Identify vertebrates and invertebrates (5-K.2)", "Use evidence to classify mammals, birds, fish, reptiles, and amphibians (5-K.3)", "Use evidence to classify animals (5-K.4)", "Human organs and their functions (5-M.3)", "Body systems: circulation and respiration (5-M.4)", "Body systems: digestion (5-M.5)", "Body systems: removing waste (5-M.6)", "Body systems: perception and motion (5-M.7)", "Classify fruits and vegetables as plant parts (5-N.1)", "Identify plant parts and their functions (5-N.2)", "Identify flower parts and their functions (5-N.4)", "Identify the photosynthetic organism (5-N.7)", "SC.5.L.15 Diversity and Evolution of Living Organisms"]}, {"code": "SC.5.L.15.1", "desc": "Describe how, when the environment changes, differences between individuals allow some plants and animals to survive and reproduce while others die or move to new locations.", "subskills": ["Animal adaptations: beaks, mouths, and necks (5-O.1)", "Animal adaptations: feet and limbs (5-O.2)", "Animal adaptations: skins and body coverings (5-O.3)", "SC.5.L.17 Interdependence"]}, {"code": "SC.5.L.17.1", "desc": "Compare and contrast adaptations displayed by animals and plants that enable them to survive in different environments such as life cycles variations, animal behaviors and physical characteristics.", "subskills": ["Read and construct animal life cycle diagrams (5-M.1)", "Compare animal life cycles (5-M.2)", "Flowering plant and conifer life cycles (5-N.5)", "Moss and fern life cycles (5-N.6)", "Animal adaptations: beaks, mouths, and necks (5-O.1)", "Animal adaptations: feet and limbs (5-O.2)", "Animal adaptations: skins and body coverings (5-O.3)", "SC.5.P Physical Science", "SC.5.P.8 Properties of Matter"]}, {"code": "SC.5.P.8.1", "desc": "Compare and contrast the basic properties of solids, liquids, and gases, such as mass, volume, color, texture, and temperature.", "subskills": ["Identify and sort solids, liquids, and gases (5)"]}, {"code": "SC.5.P.8.2", "desc": "Investigate and identify materials that will dissolve in water and those that will not and identify the conditions that will speed up or slow down the dissolving process.", "subskills": []}, {"code": "SC.5.P.8.3", "desc": "Demonstrate and explain that mixtures of solids can be separated based on observable properties of their parts such as particle size, shape, color, and magnetic attraction.", "subskills": ["Identify mixtures (5-D.3)"]}, {"code": "SC.5.P.8.4", "desc": "Explore the scientific theory of atoms (also called atomic theory) by recognizing that all matter is composed of parts that are too small to be seen without magnification.", "subskills": ["SC.5.P.9 Changes in Matter"]}, {"code": "SC.5.P.9.1", "desc": "Investigate and describe that many physical and chemical changes are affected by temperature.", "subskills": ["Heating, cooling, and changes of state (5-C.3)", "Compare physical and chemical changes (5-D.1)", "SC.5.P.10 Forms of Energy"]}, {"code": "SC.5.P.10.1", "desc": "Investigate and describe some basic forms of energy, including light, heat, sound, electrical, chemical, and mechanical.", "subskills": ["How are temperature and mass related to thermal energy? (5-C.6)"]}, {"code": "SC.5.P.10.2", "desc": "Investigate and explain that energy has the ability to cause motion or create change.", "subskills": ["How are speed and energy related? (5-F.4)", "Use tables and graphs to identify patterns about kinetic energy (6-H.2)", "Explore energy transformations: roller coaster ride (6-H.3)", "Explore energy transformations: bike ride (6-H.4)"]}, {"code": "SC.5.P.10.3", "desc": "Investigate and explain that an electrically-charged object can attract an uncharged object and can either attract or repel another charged object without any contact between the objects.", "subskills": ["Identify magnets that attract or repel (5-G.1)", "Label magnets that attract or repel (5-G.2)", "Compare magnitudes of magnetic forces (5-G.3)"]}, {"code": "SC.5.P.10.4", "desc": "Investigate and explain that electrical energy can be transformed into heat, light, and sound energy, as well as the energy of motion.", "subskills": ["Energy transformation (5-H.1)", "Explore energy transformations: roller coaster ride (6-H.3)", "SC.5.P.11 Energy Transfer and Transformations"]}, {"code": "SC.5.P.11.1", "desc": "Investigate and illustrate the fact that the flow of electricity requires a closed circuit (a complete loop).", "subskills": ["Electric circuits (5-I.1)"]}, {"code": "SC.5.P.11.2", "desc": "Identify and classify materials that conduct electricity and materials that do not.", "subskills": ["Conductors and insulators (5-I.2)", "SC.5.P.13 Forces and Changes in Motion"]}, {"code": "SC.5.P.13.1", "desc": "Identify familiar forces that cause objects to move, such as pushes or pulls, including gravity acting on falling objects.", "subskills": ["Identify directions of forces (5-F.1)"]}, {"code": "SC.5.P.13.2", "desc": "Investigate and describe that the greater the force applied to it, the greater the change in motion of a given object.", "subskills": ["How do balanced and unbalanced forces affect motion? (5-F.2)"]}, {"code": "SC.5.P.13.3", "desc": "Investigate and describe that the more mass an object has, the less effect a given force will have on the object's motion.", "subskills": ["How does mass affect force and acceleration? (5-F.3)"]}, {"code": "SC.5.P.13.4", "desc": "Investigate and explain that when a force is applied to an object but it does not move, it is because another opposing force is being applied by something in the environment so that the forces are balanced.", "subskills": ["How do balanced and unbalanced forces affect motion? (5-F.2)"]}], "meta": {"built": "2025-08-18"}};
-
-// Local state
-let SUBJECTS = ["Reading","Math","Science"];
-let STUDENTS = JSON.parse(localStorage.getItem('fl_students')||'[]');
-let RECORDS = JSON.parse(localStorage.getItem('fl_records')||'[]');
-let SETTINGS = JSON.parse(localStorage.getItem('fl_settings')||'{}');
-
-// Supabase baked config
-let SB_CFG = JSON.parse(localStorage.getItem('kv_supabase_cfg')||'{}');
-const SB_URL_DEFAULT = "https://pgmxbogkgnpekjoolgte.supabase.co";
-const SB_KEY_DEFAULT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBnbXhib2drZ25wZWtqb29sZ3RlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU0MDEzNzIsImV4cCI6MjA3MDk3NzM3Mn0.DePl3SELtw06yueZJQPvXYTmUEnz9WC-iCaXreCXUQ8";
-function getSbUrl(){ return SB_CFG.url || SB_URL_DEFAULT; }
-function getSbKey(){ return SB_CFG.key || SB_KEY_DEFAULT; }
-
-// Tabs
-(function(){ 
-  const tabs = document.querySelectorAll('.tab');
-  const sections = document.querySelectorAll('.section');
-  function activate(id){ sections.forEach(s=>s.classList.toggle('active', s.id===id)); tabs.forEach(t=>t.classList.toggle('active', t.dataset.tab===id)); }
-  tabs.forEach(t=>t.addEventListener('click', ()=>activate(t.dataset.tab)));
-  activate('quick');
-})();
-
-// Admin tab hidden unless owner
-(function(){
-  const adminTab = document.getElementById('adminTab');
-  if(localStorage.getItem('kv_admin')==='1'){
-    adminTab.style.display = 'inline-block';
-  } else {
-    adminTab.style.display = 'none';
-  }
-})();
-
-// Refs
-const studentSelect = document.getElementById('studentSelect');
-const subjectSelect = document.getElementById('subjectSelect');
-const standardSelect = document.getElementById('standardSelect');
-const subskillSelect = document.getElementById('subskillSelect');
-const standardSearch = document.getElementById('standardSearch');
-const ratingGroup = document.getElementById('ratingGroup');
-const dateInput = document.getElementById('dateInput');
-const notesEl = document.getElementById('notes');
-const filterStudent = document.getElementById('filterStudent');
-const filterCode = document.getElementById('filterCode');
-const filterSubject = document.getElementById('filterSubject');
-const filterRating = document.getElementById('filterRating');
-const tbody = document.querySelector('#dataTable tbody');
-const studentViewSelect = document.getElementById('studentViewSelect');
-const studentTableBody = document.querySelector('#studentTable tbody');
-const sbUrl = document.getElementById('sbUrl');
-const sbKey = document.getElementById('sbKey');
-const saveSb = document.getElementById('saveSb');
-
-function setToday(){ const d=new Date(); const iso=d.toISOString().slice(0,10); if(dateInput) dateInput.value=iso; } setToday();
-function masked(name){ return name; }
-
-function renderStudents(){
-  studentSelect.innerHTML = '<option value="">' + (STUDENTS.length?'Select student…':'No students yet') + '</option>' + STUDENTS.map((s,i)=>`<option value="${i}">${masked(s.name)}</option>`).join('');
-  studentViewSelect.innerHTML = '<option value="">Choose student…</option>' + STUDENTS.map((s,i)=>`<option value="${i}">${masked(s.name)}</option>`).join('');
-  const sc=document.getElementById('studentCount'); if(sc) sc.textContent = STUDENTS.length ? `${STUDENTS.length} students` : 'No students yet';
-  localStorage.setItem('fl_students', JSON.stringify(STUDENTS));
-}
-function renderSubjects(){
-  subjectSelect.innerHTML = SUBJECTS.map(s=>`<option value="${s}">${s}</option>`).join('');
-  filterSubject.innerHTML = '<option value="">All</option>' + SUBJECTS.map(s=>`<option value="${s}">${s}</option>`).join('');
-}
-function getStandardsForSubject(subj){ return (STANDARDS[subj]||[]); }
-function renderStandards(){
-  const subj = subjectSelect.value || SUBJECTS[0]; subjectSelect.value=subj;
-  const list = getStandardsForSubject(subj);
-  const q = (standardSearch.value||'').toLowerCase();
-  const filtered = list.filter(x => (x.code+' '+x.desc).toLowerCase().includes(q));
-  standardSelect.innerHTML = '<option value="">Select standard…</option>' + filtered.map((x,idx)=>`<option value="${idx}">${x.code} — ${x.desc}</option>`).join('');
-  subskillSelect.innerHTML = '<option value="">Select subskill…</option>'; subskillSelect.disabled = true;
-}
-function renderSubskills(){
-  const subj = subjectSelect.value; const idx = standardSelect.value;
-  if(idx===''){ subskillSelect.innerHTML='<option value="">Select subskill…</option>'; subskillSelect.disabled=true; return; }
-  const st = getStandardsForSubject(subj)[idx]; const subs = st.subskills||[];
-  subskillSelect.innerHTML = '<option value="">Select subskill…</option>' + subs.map((s,i)=>`<option value="${i}">${s}</option>`).join('');
-  subskillSelect.disabled = subs.length===0;
-}
-
-ratingGroup.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{ ratingGroup.querySelectorAll('button').forEach(x=>x.style.borderColor='var(--line)'); b.style.borderColor='var(--accent)'; ratingGroup.dataset.value=b.dataset.v; }));
-
-function saveRecord(){
-  const sIdx = studentSelect.value; const subj=subjectSelect.value; const stdIdx=standardSelect.value; const subIdx=subskillSelect.value; const rating=parseInt(ratingGroup.dataset.value||'0',10); const note=(notesEl.value||'').trim();
-  if(sIdx==='') return alert('Choose a student'); if(!subj) return alert('Choose a subject'); if(stdIdx==='') return alert('Choose a standard'); if(!rating) return alert('Pick 1–5');
-  const std = getStandardsForSubject(subj)[stdIdx];
-  const subskill = (subIdx==='') ? '' : (std.subskills||[])[subIdx]||'';
-  const rec = {date: dateInput.value, student: STUDENTS[sIdx].name, subject: subj, code: std.code, standard: std.desc, subskill, rating, notes: note};
-  RECORDS.push(rec); localStorage.setItem('fl_records', JSON.stringify(RECORDS));
-  notesEl.value=''; ratingGroup.dataset.value=''; ratingGroup.querySelectorAll('button').forEach(x=>x.style.borderColor='var(--line)');
-  alert('Saved');
-}
-
-function renderTable(){
-  const fs=(filterStudent.value||'').toLowerCase(); const fc=(filterCode.value||'').toLowerCase(); const fsub=filterSubject.value; const frat=filterRating.value;
-  const rows = RECORDS.filter(r => (!fs || (r.student||'').toLowerCase().includes(fs)) && (!fc || ((r.code+' '+r.standard+' '+(r.subskill||'')).toLowerCase().includes(fc))) && (!fsub || r.subject===fsub) && (!frat || String(r.rating)===frat) );
-  tbody.innerHTML = rows.map((r,i)=>`<tr><td>${r.date}</td><td>${r.student}</td><td>${r.subject}</td><td>${r.code}</td><td>${r.standard}</td><td>${r.subskill||''}</td><td>${r.rating}</td><td>${(r.notes||'').replace(/</g,'&lt;')}</td><td><button data-del="${i}">Delete</button></td></tr>`).join('');
-}
-function renderStudentView(){
-  const idx=studentViewSelect.value; const target = (idx===''?null:STUDENTS[idx]?.name); const rows = target? RECORDS.filter(r=>r.student===target) : []; 
-  studentTableBody.innerHTML = rows.map((r,i)=>`<tr><td>${r.date}</td><td>${r.subject}</td><td>${r.code}</td><td>${r.standard}</td><td>${r.subskill||''}</td><td>${r.rating}</td><td>${(r.notes||'').replace(/</g,'&lt;')}</td><td><button data-sdel="${i}">Delete</button></td></tr>`).join('');
-}
-
-// ====== LOGIN FIX (v12.6.1) ======
-// Rule:
-// - If owner password field is non-empty -> treat as owner attempt ONLY.
-// - Else if email+code are both non-empty -> treat as teacher login ONLY.
-// - Do not mix the two; do not prompt again after success.
-async function redeemInvite(code, email){
-  const url=(SB_CFG.url||"") || "https://pgmxbogkgnpekjoolgte.supabase.co"; 
-  const key=(SB_CFG.key||"") || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBnbXhib2drZ25wZWtqb29sZ3RlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU0MDEzNzIsImV4cCI6MjA3MDk3NzM3Mn0.DePl3SELtw06yueZJQPvXYTmUEnz9WC-iCaXreCXUQ8";
-  try{
-    const resp=await fetch(`${url}/rest/v1/rpc/redeem_code`, {method:'POST', headers:{'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json'}, body:JSON.stringify({code, email})});
-    if(!resp.ok){ console.error('RPC error', resp.status, await resp.text()); setGateErr('Server error.'); return false; }
-    const ok=await resp.json(); return !!ok;
-  }catch(e){ console.error('RPC net', e); setGateErr('Network error.'); return false; }
-}
-async function adminAuth(pw){
-  const url=(SB_CFG.url||"") || "https://pgmxbogkgnpekjoolgte.supabase.co"; 
-  const key=(SB_CFG.key||"") || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBnbXhib2drZ25wZWtqb29sZ3RlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU0MDEzNzIsImV4cCI6MjA3MDk3NzM3Mn0.DePl3SELtw06yueZJQPvXYTmUEnz9WC-iCaXreCXUQ8";
-  const resp=await fetch(`${url}/rest/v1/rpc/admin_auth`, {method:'POST', headers:{'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json'}, body:JSON.stringify({pw})});
-  if(!resp.ok) return false; const ok=await resp.json(); return (ok===true||ok===1);
-}
-function setGateErr(msg){ const el=document.getElementById('gateErr'); if(el) el.textContent=msg; }
-
-async function unifiedAccess(){
-  const email = (document.getElementById('gateEmail').value||'').trim();
-  const rawCode = (document.getElementById('gateCode').value||'');
-  const code = rawCode.trim().toUpperCase();
-  const pw = (document.getElementById('ownerPass').value||'').trim();
-
-  // Owner path (only if pw present)
-  if(pw){
-    const ok = await adminAuth(pw);
-    if(ok){
-      localStorage.setItem('kv_admin','1');
-      localStorage.setItem('kv_access_granted','1');
-      document.getElementById('adminTab').style.display='inline-block';
-      document.getElementById('gateOverlay').style.display='none';
-      return;
-    } else {
-      setGateErr('Owner password incorrect.');
-      return;
-    }
-  }
-
-  // Teacher path (requires both email+code)
-  if(email && code){
-    const ok = await redeemInvite(code, email);
-    if(ok){
-      localStorage.setItem('kv_access_granted','1');
-      document.getElementById('gateOverlay').style.display='none';
-      return;
-    } else {
-      setGateErr('Invalid or already redeemed code.');
-      return;
-    }
-  }
-
-  // Neither path valid
-  setGateErr('Teachers: enter email + code. Owner: enter owner password only.');
-}
-
-(function(){
-  const btn=document.getElementById('gateSubmit'); if(btn) btn.addEventListener('click', unifiedAccess);
-  ['ownerPass','gateCode','gateEmail'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.addEventListener('keydown', e=>{ if(e.key==='Enter') unifiedAccess(); });
-  });
-  if(localStorage.getItem('kv_access_granted')!=='1'){
-    const ov=document.getElementById('gateOverlay'); if(ov) ov.style.display='flex';
-  }
-})();
-// ====== END LOGIN FIX ======
-
-// Admin panel
-(async function(){
-  const logout=document.getElementById('adminLogout');
-  if(logout) logout.addEventListener('click', ()=>{ localStorage.removeItem('kv_admin'); alert('Admin logged out (this browser).'); location.reload(); });
-  async function rpc(name, body){ const url=(SB_CFG.url||"") || "https://pgmxbogkgnpekjoolgte.supabase.co", key=(SB_CFG.key||"") || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBnbXhib2drZ25wZWtqb29sZ3RlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU0MDEzNzIsImV4cCI6MjA3MDk3NzM3Mn0.DePl3SELtw06yueZJQPvXYTmUEnz9WC-iCaXreCXUQ8"; const r=await fetch(`${url}/rest/v1/rpc/${name}`,{method:'POST',headers:{'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json'},body:JSON.stringify(body||{})}); if(!r.ok) throw new Error(name+' failed: '+r.status+' '+await r.text()); const ct=r.headers.get('content-type')||''; return ct.includes('application/json')?await r.json():null; }
-  async function refreshCodes(){ try{ const rows=await rpc('admin_list_codes',{}); const tb=document.querySelector('#codesTable tbody'); tb.innerHTML=(rows||[]).map(r=>`<tr><td>${r.code}</td><td>${r.email||''}</td><td>${r.redeemed?'Yes':'No'}</td><td>${r.redeemed_at||''}</td><td>${r.redeemed_by||''}</td><td><button onclick="adminReset('${encodeURIComponent(r.code)}')">Reset</button> <button onclick="adminDelete('${encodeURIComponent(r.code)}')">Delete</button></td></tr>`).join(''); }catch(e){ alert('Refresh failed: '+e.message); } }
-  window.adminDelete = async function(codeEnc){ const code=decodeURIComponent(codeEnc); if(!confirm('Delete this code?')) return; try{ const ok=await rpc('admin_delete_code',{code}); if(ok===true||ok===1) refreshCodes(); else alert('Delete failed.'); }catch(e){ alert('Delete failed: '+e.message); } }
-  window.adminReset = async function(codeEnc){ const code=decodeURIComponent(codeEnc); try{ const ok=await rpc('admin_reset_code',{code}); if(ok===true||ok===1) refreshCodes(); else alert('Reset failed.'); }catch(e){ alert('Reset failed: '+e.message); } }
-  const addBtn=document.getElementById('addCode');
-  if(addBtn) addBtn.addEventListener('click', async ()=>{
-    let code=(document.getElementById('newCode').value||''); code=code.trim().toUpperCase(); const email=(document.getElementById('newEmail').value||'').trim(); if(!code) return alert('Enter a code');
-    try{ const ok=await rpc('admin_add_code',{code,email}); if(ok===true||ok===1){ document.getElementById('newCode').value=''; document.getElementById('newEmail').value=''; refreshCodes(); } else alert('Add failed.'); }catch(e){ alert('Add failed: '+e.message); }
-  });
-  const refBtn=document.getElementById('refreshCodes');
-  if(refBtn) refBtn.addEventListener('click', refreshCodes);
-  refreshCodes();
-})();
-
-(function init(){
-  renderStudents(); renderSubjects(); renderStandards();
-  if(sbUrl) sbUrl.value = "https://pgmxbogkgnpekjoolgte.supabase.co";
-  if(sbKey) sbKey.value = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBnbXhib2drZ25wZWtqb29sZ3RlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU0MDEzNzIsImV4cCI6MjA3MDk3NzM3Mn0.DePl3SELtw06yueZJQPvXYTmUEnz9WC-iCaXreCXUQ8".slice(0,6)+'…';
-  if(saveSb) saveSb.addEventListener('click', ()=>{ SB_CFG={url: sbUrl.value.trim(), key: sbKey.value.trim()}; localStorage.setItem('kv_supabase_cfg', JSON.stringify(SB_CFG)); alert('Saved. Reloading…'); location.reload(); });
-})();
-
-if('serviceWorker' in navigator){ window.addEventListener('load', ()=>navigator.serviceWorker.register('./sw.js')); }
-</script>
+<script src="app.js"></script>
 </body>
 </html>

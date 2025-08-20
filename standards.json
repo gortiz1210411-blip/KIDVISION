@@ -1,0 +1,32 @@
+{
+  "Reading": [
+    {
+      "code": "ELA.5.R.1.1",
+      "desc": "Analyze setting, events...",
+      "subskills": [
+        "Character actions",
+        "Dialogue"
+      ]
+    }
+  ],
+  "Math": [
+    {
+      "code": "MA.5.NSO.1.2",
+      "desc": "Read/write multi-digit numbers",
+      "subskills": [
+        "Expanded form",
+        "Standard form"
+      ]
+    }
+  ],
+  "Science": [
+    {
+      "code": "SC.5.E.5.1",
+      "desc": "Recognize that a galaxy...",
+      "subskills": [
+        "Milky Way",
+        "Stars, gas, dust"
+      ]
+    }
+  ]
+}

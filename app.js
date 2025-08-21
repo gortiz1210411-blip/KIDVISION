@@ -1,2 +1,1 @@
-// JS logic for main app
-console.log('app.js v1273 loaded');
+console.log('app v1273 placeholder stub (will be replaced)');

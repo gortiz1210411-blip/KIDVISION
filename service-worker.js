@@ -1,1 +1,1 @@
-const CACHE='kidvision-v1273'; self.addEventListener('install',e=>{self.skipWaiting()});
+const CACHE='kidvision-v1273'; self.addEventListener('install',e=>self.skipWaiting());
